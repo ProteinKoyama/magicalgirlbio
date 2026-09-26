@@ -1,0 +1,317 @@
+[gd_scene format=3 uid="uid://bnjy1riq7q62y"]
+
+[ext_resource type="FontFile" uid="uid://baywwgegtnssu" path="res://Assets/AkazukiPOP.otf" id="2_ig5kc"]
+[ext_resource type="Script" uid="uid://bwx20nv5xrdpw" path="res://title_screen.gd" id="3_script"]
+[ext_resource type="Texture2D" uid="uid://xnbpaamga0wr" path="res://Assets/01122_1_1.png" id="4_credit_icon"]
+[ext_resource type="Texture2D" path="res://Assets/start_button_jp.png" id="5_start_button"]
+[ext_resource type="Texture2D" path="res://Assets/credit_button_jp.png" id="6_credit_button"]
+[ext_resource type="Texture2D" uid="uid://b564tjjoeus27" path="res://Assets/logo.png" id="7_jqemp"]
+[ext_resource type="Texture2D" uid="uid://dt47sxemktdes" path="res://Assets/purpleslice.png" id="8_purple_slice"]
+[ext_resource type="Texture2D" uid="uid://dhxf0qt6slaef" path="res://Assets/volume_bar.png" id="9_volume_bar"]
+[ext_resource type="Texture2D" uid="uid://bttksmxe1nsyd" path="res://Assets/volume_knob.png" id="10_volume_knob"]
+[ext_resource type="Texture2D" uid="uid://dpeu51kj1qal7" path="res://Assets/gaia_credit_placeholder.svg" id="11_gaia_icon"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_f175k"]
+texture = ExtResource("9_volume_bar")
+texture_margin_top = 10.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_bmb4v"]
+texture = ExtResource("9_volume_bar")
+texture_margin_top = 10.0
+
+[sub_resource type="Theme" id="Theme_credits"]
+default_font = ExtResource("2_ig5kc")
+default_font_size = 28
+Label/colors/font_color = Color(1, 1, 1, 1)
+
+[node name="TitleScene" type="Control" unique_id=832864324]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("3_script")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1030544412]
+layout_mode = 0
+offset_left = -237.0
+offset_top = -187.0
+offset_right = 2134.0
+offset_bottom = 1257.0
+color = Color(0.012617188, 0.012617188, 0.012617188, 1)
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=219307328]
+
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer" unique_id=1677027221]
+offset_right = 1920.0
+offset_bottom = 1080.0
+color = Color(0.5176471, 0.8509804, 1, 1)
+
+[node name="StartButton" type="TextureButton" parent="CanvasLayer" unique_id=1816301203]
+unique_name_in_owner = true
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -461.0
+offset_top = -319.0
+offset_right = -78.0
+offset_bottom = -182.0
+grow_horizontal = 0
+grow_vertical = 0
+texture_normal = ExtResource("5_start_button")
+texture_pressed = ExtResource("5_start_button")
+texture_hover = ExtResource("5_start_button")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="CreditsButton" type="TextureButton" parent="CanvasLayer" unique_id=1321457454]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -427.0
+offset_top = -165.0
+offset_right = -78.0
+offset_bottom = -45.0
+grow_horizontal = 0
+grow_vertical = 0
+texture_normal = ExtResource("6_credit_button")
+texture_pressed = ExtResource("6_credit_button")
+texture_hover = ExtResource("6_credit_button")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="SoundPanel" type="NinePatchRect" parent="CanvasLayer" unique_id=496273427]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -603.0
+offset_top = 60.0
+offset_right = -61.0
+offset_bottom = 300.0
+grow_horizontal = 0
+texture = ExtResource("8_purple_slice")
+patch_margin_left = 80
+patch_margin_top = 80
+patch_margin_right = 80
+patch_margin_bottom = 80
+
+[node name="Margin" type="MarginContainer" parent="CanvasLayer/SoundPanel" unique_id=2082675501]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 85.0
+offset_top = 65.0
+offset_right = -85.0
+offset_bottom = -65.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Rows" type="VBoxContainer" parent="CanvasLayer/SoundPanel/Margin" unique_id=579683437]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="BgmRow" type="HBoxContainer" parent="CanvasLayer/SoundPanel/Margin/Rows" unique_id=404096872]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/SoundPanel/Margin/Rows/BgmRow" unique_id=764053384]
+custom_minimum_size = Vector2(62, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 32
+text = "BGM"
+
+[node name="BgmSlider" type="HSlider" parent="CanvasLayer/SoundPanel/Margin/Rows/BgmRow" unique_id=1765646385]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 28)
+layout_mode = 2
+size_flags_horizontal = 0
+mouse_default_cursor_shape = 2
+theme_override_icons/grabber = ExtResource("10_volume_knob")
+theme_override_icons/grabber_highlight = ExtResource("10_volume_knob")
+theme_override_styles/slider = SubResource("StyleBoxTexture_f175k")
+value = 20.0
+
+[node name="BgmValue" type="Label" parent="CanvasLayer/SoundPanel/Margin/Rows/BgmRow" unique_id=754616129]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 30
+text = "20%"
+horizontal_alignment = 2
+
+[node name="SeRow" type="HBoxContainer" parent="CanvasLayer/SoundPanel/Margin/Rows" unique_id=411198949]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/SoundPanel/Margin/Rows/SeRow" unique_id=569060825]
+custom_minimum_size = Vector2(62, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 32
+text = "SE"
+
+[node name="SeSlider" type="HSlider" parent="CanvasLayer/SoundPanel/Margin/Rows/SeRow" unique_id=1688709666]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 28)
+layout_mode = 2
+size_flags_horizontal = 0
+mouse_default_cursor_shape = 2
+theme_override_icons/grabber = ExtResource("10_volume_knob")
+theme_override_icons/grabber_highlight = ExtResource("10_volume_knob")
+theme_override_styles/slider = SubResource("StyleBoxTexture_bmb4v")
+value = 50.0
+
+[node name="SeValue" type="Label" parent="CanvasLayer/SoundPanel/Margin/Rows/SeRow" unique_id=1649788448]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 30
+text = "50%"
+horizontal_alignment = 2
+
+[node name="Logo" type="Sprite2D" parent="CanvasLayer" unique_id=1804141898]
+position = Vector2(677, 204)
+scale = Vector2(0.51309377, 0.44272244)
+texture = ExtResource("7_jqemp")
+
+[node name="CreditsOverlay" type="Control" parent="CanvasLayer" unique_id=946809475]
+unique_name_in_owner = true
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Center" type="CenterContainer" parent="CanvasLayer/CreditsOverlay" unique_id=929439480]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Window" type="NinePatchRect" parent="CanvasLayer/CreditsOverlay/Center" unique_id=1400155140]
+custom_minimum_size = Vector2(1000, 820)
+layout_mode = 2
+theme = SubResource("Theme_credits")
+texture = ExtResource("8_purple_slice")
+patch_margin_left = 80
+patch_margin_top = 80
+patch_margin_right = 80
+patch_margin_bottom = 80
+
+[node name="Padding" type="MarginContainer" parent="CanvasLayer/CreditsOverlay/Center/Window" unique_id=262327871]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 90.0
+offset_top = 80.0
+offset_right = -90.0
+offset_bottom = -80.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Content" type="VBoxContainer" parent="CanvasLayer/CreditsOverlay/Center/Window/Padding" unique_id=3232662]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="Heading" type="Label" parent="CanvasLayer/CreditsOverlay/Center/Window/Padding/Content" unique_id=1345425262]
+layout_mode = 2
+theme_override_font_sizes/font_size = 44
+text = "CREDITS"
+horizontal_alignment = 1
+
+[node name="Members" type="HBoxContainer" parent="CanvasLayer/CreditsOverlay/Center/Window/Padding/Content" unique_id=651505449]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 80
+alignment = 1
+
+[node name="Engineer" type="VBoxContainer" parent="CanvasLayer/CreditsOverlay/Center/Window/Padding/Content/Members" unique_id=1646558078]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Role" type="Label" parent="CanvasLayer/CreditsOverlay/Center/Window/Padding/Content/Members/Engineer" unique_id=919045717]
+layout_mode = 2
+text = "エンジニア/アート"
+horizontal_alignment = 1
+
+[node name="Icon" type="TextureRect" parent="CanvasLayer/CreditsOverlay/Center/Window/Padding/Content/Members/Engineer" unique_id=936939055]
+custom_minimum_size = Vector2(160, 160)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_filter = 2
+texture = ExtResource("4_credit_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Name" type="Label" parent="CanvasLayer/CreditsOverlay/Center/Window/Padding/Content/Members/Engineer" unique_id=2072198979]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "さいきん"
+horizontal_alignment = 1
+
+[node name="Artist" type="VBoxContainer" parent="CanvasLayer/CreditsOverlay/Center/Window/Padding/Content/Members" unique_id=608213773]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Role" type="Label" parent="CanvasLayer/CreditsOverlay/Center/Window/Padding/Content/Members/Artist" unique_id=1181640454]
+layout_mode = 2
+text = "アート"
+horizontal_alignment = 1
+
+[node name="Icon" type="TextureRect" parent="CanvasLayer/CreditsOverlay/Center/Window/Padding/Content/Members/Artist" unique_id=531478554]
+custom_minimum_size = Vector2(160, 160)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_filter = 2
+texture = ExtResource("11_gaia_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Name" type="Label" parent="CanvasLayer/CreditsOverlay/Center/Window/Padding/Content/Members/Artist" unique_id=829883255]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "ガイアｷｭﾝ"
+horizontal_alignment = 1
+
+[node name="MaterialsHeading" type="Label" parent="CanvasLayer/CreditsOverlay/Center/Window/Padding/Content" unique_id=1413278467]
+layout_mode = 2
+text = "使用素材"
+horizontal_alignment = 1
+
+[node name="Label" type="Label" parent="CanvasLayer/CreditsOverlay/Center/Window/Padding/Content" unique_id=1790909399]
+layout_mode = 2
+text = "フリーBGM・音楽素材MusMus https://musmus.main.jp"
+horizontal_alignment = 1
+
+[node name="Materials" type="Label" parent="CanvasLayer/CreditsOverlay/Center/Window/Padding/Content" unique_id=508870021]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "フォント：AkazukiPOP"
+horizontal_alignment = 1
+
+[node name="CreditsCloseButton" type="Button" parent="CanvasLayer/CreditsOverlay/Center/Window/Padding/Content" unique_id=1919527083]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(180, 56)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "閉じる"

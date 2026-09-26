@@ -1,0 +1,643 @@
+[gd_scene format=3 uid="uid://cd6iyloa7jqjn"]
+
+[ext_resource type="Script" uid="uid://ka7tmr3bqi6o" path="res://battle.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://du7t6rpxwer8b" path="res://Assets/09254.png" id="2_dw4jg"]
+[ext_resource type="Texture2D" uid="uid://cu1nuy4vd31v2" path="res://Assets/enemy_placeholder.svg" id="3"]
+[ext_resource type="Texture2D" uid="uid://ij8sqsyy5pow" path="res://Assets/09253.png" id="3_0npn6"]
+[ext_resource type="Texture2D" uid="uid://dxxoncbl7jyk" path="res://Assets/09251.png" id="4_mhv3b"]
+[ext_resource type="FontFile" uid="uid://baywwgegtnssu" path="res://Assets/AkazukiPOP.otf" id="5_lcjiy"]
+[ext_resource type="Texture2D" uid="uid://duirtvt4mwllq" path="res://Assets/nextButton.png" id="6_next"]
+[ext_resource type="Texture2D" uid="uid://bufthwq88o17h" path="res://Assets/retryButton.png" id="7_retry"]
+[ext_resource type="Texture2D" uid="uid://c5fb8s7iwsemc" path="res://Assets/cancelButton.png" id="8_cancel"]
+[ext_resource type="Texture2D" uid="uid://dt47sxemktdes" path="res://Assets/purpleslice.png" id="9_purple_slice"]
+[ext_resource type="Texture2D" uid="uid://1tv1lhwk2dxl" path="res://Assets/closeButton.png" id="10_close"]
+[ext_resource type="Texture2D" path="res://Assets/poison_skull.svg" id="11_poison_skull"]
+[ext_resource type="AudioStream" path="res://Assets/se_attack.mp3" id="12_attack_se"]
+[ext_resource type="AudioStream" path="res://Assets/se_bomb.mp3" id="13_bomb_se"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_7g1a8"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_dw4jg")
+}],
+"loop": 1,
+"name": &"attack",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_0npn6")
+}],
+"loop": 1,
+"name": &"damaged",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_mhv3b")
+}],
+"loop": 1,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="LabelSettings" id="LabelSettings_p22n3"]
+font = ExtResource("5_lcjiy")
+font_size = 52
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_fill"]
+bg_color = Color(0.117647, 0.8, 0.25098, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_charge_fill"]
+bg_color = Color(0.619608, 0, 1, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="Shader" id="Shader_enemy_defeat"]
+code = "shader_type canvas_item;
+
+uniform float shake_offset = 0.0;
+uniform float disappear_progress : hint_range(0.0, 1.0) = 0.0;
+
+void vertex() {
+	VERTEX.x += shake_offset;
+}
+
+void fragment() {
+	float visible_area = 1.0 - step(1.0 - disappear_progress, UV.y);
+	COLOR.a *= visible_area;
+}"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_enemy_defeat"]
+resource_local_to_scene = true
+shader = SubResource("Shader_enemy_defeat")
+shader_parameter/shake_offset = 0.0
+shader_parameter/disappear_progress = 0.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_purple_slice"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+texture = ExtResource("9_purple_slice")
+texture_margin_left = 80.0
+texture_margin_top = 80.0
+texture_margin_right = 80.0
+texture_margin_bottom = 80.0
+
+[node name="Battle" type="Control" unique_id=1297512065]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 1.0
+offset_right = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="AttackSePlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("12_attack_se")
+bus = &"SE"
+max_polyphony = 4
+
+[node name="BombSePlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("13_bomb_se")
+bus = &"SE"
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=2052995328]
+layout_mode = 0
+offset_right = 1931.0
+offset_bottom = 1087.0
+color = Color(0.5176471, 0.8509804, 1, 1)
+
+[node name="Title" type="Label" parent="." unique_id=2016646009]
+layout_mode = 0
+offset_top = 30.0
+offset_right = 1920.0
+offset_bottom = 90.0
+theme_override_font_sizes/font_size = 38
+horizontal_alignment = 1
+
+[node name="RoundInfo" type="Label" parent="." unique_id=742034249]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -650.0
+offset_top = 105.0
+offset_right = 650.0
+offset_bottom = 195.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 52
+text = "ラウンド 1　プレイヤー先攻"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 0
+
+[node name="Player" type="VBoxContainer" parent="." unique_id=57769179]
+layout_mode = 1
+offset_left = 107.0
+offset_top = 120.0
+offset_right = 497.0
+offset_bottom = 670.0
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Player" unique_id=2144865438]
+position = Vector2(208, 890)
+scale = Vector2(0.4, 0.4)
+sprite_frames = SubResource("SpriteFrames_7g1a8")
+
+[node name="Name" type="Label" parent="Player" unique_id=101198678]
+custom_minimum_size = Vector2(260, 44)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "ばいお"
+label_settings = SubResource("LabelSettings_p22n3")
+horizontal_alignment = 1
+
+[node name="HPText" type="Label" parent="Player" unique_id=818144453]
+custom_minimum_size = Vector2(390, 51)
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+horizontal_alignment = 1
+
+[node name="HP" type="ProgressBar" parent="Player" unique_id=1017376613]
+custom_minimum_size = Vector2(390, 39)
+layout_mode = 2
+theme_override_styles/fill = SubResource("StyleBoxFlat_hp_fill")
+show_percentage = false
+
+[node name="ChargeText" type="Label" parent="Player" unique_id=278085515]
+custom_minimum_size = Vector2(390, 45)
+layout_mode = 2
+theme_override_font_sizes/font_size = 27
+text = "必殺チャージ 0 / 8"
+horizontal_alignment = 1
+
+[node name="Charge" type="ProgressBar" parent="Player" unique_id=1522005918]
+custom_minimum_size = Vector2(390, 33)
+layout_mode = 2
+theme_override_styles/fill = SubResource("StyleBoxFlat_charge_fill")
+max_value = 8.0
+show_percentage = false
+
+[node name="PlayerClickArea" type="Button" parent="." unique_id=5675318]
+z_index = 20
+layout_mode = 0
+offset_left = 18.0
+offset_top = 362.0
+offset_right = 613.0
+offset_bottom = 1080.0
+focus_mode = 0
+mouse_default_cursor_shape = 2
+flat = true
+
+[node name="Enemy" type="VBoxContainer" parent="." unique_id=1412464088]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -550.0
+offset_top = 150.0
+offset_right = -50.0
+offset_bottom = 906.0
+grow_horizontal = 0
+
+[node name="NameRow" type="HBoxContainer" parent="Enemy"]
+custom_minimum_size = Vector2(500, 44)
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="Name" type="Label" parent="Enemy/NameRow" unique_id=522876077]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+horizontal_alignment = 1
+
+[node name="PoisonIcon" type="TextureRect" parent="Enemy/NameRow"]
+visible = false
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("11_poison_skull")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="HPText" type="Label" parent="Enemy" unique_id=401488011]
+custom_minimum_size = Vector2(390, 51)
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+horizontal_alignment = 1
+
+[node name="HP" type="ProgressBar" parent="Enemy" unique_id=562241778]
+custom_minimum_size = Vector2(390, 39)
+layout_mode = 2
+theme_override_styles/fill = SubResource("StyleBoxFlat_hp_fill")
+show_percentage = false
+
+[node name="ChargeText" type="Label" parent="Enemy" unique_id=492038661]
+custom_minimum_size = Vector2(390, 45)
+layout_mode = 2
+theme_override_font_sizes/font_size = 27
+text = "必殺チャージ 0 / 8"
+horizontal_alignment = 1
+
+[node name="Charge" type="ProgressBar" parent="Enemy" unique_id=2135336688]
+custom_minimum_size = Vector2(390, 33)
+layout_mode = 2
+theme_override_styles/fill = SubResource("StyleBoxFlat_charge_fill")
+max_value = 8.0
+show_percentage = false
+
+[node name="Portrait" type="TextureRect" parent="Enemy" unique_id=1318743095]
+material = SubResource("ShaderMaterial_enemy_defeat")
+custom_minimum_size = Vector2(260, 300)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_default_cursor_shape = 2
+texture = ExtResource("3")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Instruction" type="Label" parent="." unique_id=2042687100]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -397.0
+offset_top = 201.0
+offset_right = 397.0
+offset_bottom = 261.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 32
+text = "欲しい魔力をクリックし、もう一度クリックして確定"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="Energy" type="VBoxContainer" parent="." unique_id=1207583577]
+layout_mode = 0
+offset_left = 760.0
+offset_top = 285.0
+offset_right = 1160.0
+offset_bottom = 842.0
+theme_override_constants/separation = 8
+
+[node name="Energy1" type="TextureButton" parent="Energy" unique_id=1894933039]
+custom_minimum_size = Vector2(400, 105)
+layout_mode = 2
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="Energy2" type="TextureButton" parent="Energy" unique_id=1038571753]
+custom_minimum_size = Vector2(400, 105)
+layout_mode = 2
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="Energy3" type="TextureButton" parent="Energy" unique_id=1999899748]
+custom_minimum_size = Vector2(400, 105)
+layout_mode = 2
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="Energy4" type="TextureButton" parent="Energy" unique_id=540413337]
+custom_minimum_size = Vector2(400, 105)
+layout_mode = 2
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="Energy5" type="TextureButton" parent="Energy" unique_id=731490533]
+custom_minimum_size = Vector2(400, 105)
+layout_mode = 2
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="SelectionDetail" type="PanelContainer" parent="." unique_id=1855328424]
+visible = false
+z_index = 50
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -380.0
+offset_top = -230.0
+offset_right = 380.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_purple_slice")
+
+[node name="MarginContainer" type="MarginContainer" parent="SelectionDetail" unique_id=48521647]
+layout_mode = 2
+theme_override_constants/margin_left = 60
+theme_override_constants/margin_top = 32
+theme_override_constants/margin_right = 60
+theme_override_constants/margin_bottom = 32
+
+[node name="VBoxContainer" type="VBoxContainer" parent="SelectionDetail/MarginContainer" unique_id=1909104291]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="SelectionDetail/MarginContainer/VBoxContainer" unique_id=89327702]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "選択中の魔力"
+horizontal_alignment = 1
+
+[node name="Description" type="Label" parent="SelectionDetail/MarginContainer/VBoxContainer" unique_id=1309106017]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 24
+text = "装備情報"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="EnemyDetailPopup" type="PopupPanel" parent="." unique_id=147190880]
+process_mode = 3
+oversampling_override = 1.0
+size = Vector2i(880, 560)
+min_size = Vector2i(880, 560)
+max_size = Vector2i(880, 560)
+theme_override_styles/panel = SubResource("StyleBoxTexture_purple_slice")
+
+[node name="MarginContainer" type="MarginContainer" parent="EnemyDetailPopup" unique_id=424612101]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 70
+theme_override_constants/margin_top = 55
+theme_override_constants/margin_right = 70
+theme_override_constants/margin_bottom = 55
+
+[node name="VBoxContainer" type="VBoxContainer" parent="EnemyDetailPopup/MarginContainer" unique_id=1990364637]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="EnemyName" type="Label" parent="EnemyDetailPopup/MarginContainer/VBoxContainer" unique_id=2934780]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 36
+text = "敵の名前"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Description" type="Label" parent="EnemyDetailPopup/MarginContainer/VBoxContainer" unique_id=926838181]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 24
+text = "敵の性能"
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="CloseButton" type="TextureButton" parent="EnemyDetailPopup/MarginContainer/VBoxContainer" unique_id=1721667948]
+custom_minimum_size = Vector2(300, 97)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource("10_close")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="PlayerDetailPopup" type="PopupPanel" parent="." unique_id=387593421]
+process_mode = 3
+size = Vector2i(980, 800)
+min_size = Vector2i(980, 800)
+max_size = Vector2i(980, 800)
+theme_override_styles/panel = SubResource("StyleBoxTexture_purple_slice")
+
+[node name="MarginContainer" type="MarginContainer" parent="PlayerDetailPopup" unique_id=142658946]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 980.0
+offset_bottom = 800.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 75
+theme_override_constants/margin_top = 60
+theme_override_constants/margin_right = 75
+theme_override_constants/margin_bottom = 60
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PlayerDetailPopup/MarginContainer" unique_id=189888995]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="PlayerName" type="Label" parent="PlayerDetailPopup/MarginContainer/VBoxContainer" unique_id=899504207]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "ばいお"
+horizontal_alignment = 1
+
+[node name="DescriptionScroll" type="ScrollContainer" parent="PlayerDetailPopup/MarginContainer/VBoxContainer" unique_id=1864138363]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Description" type="Label" parent="PlayerDetailPopup/MarginContainer/VBoxContainer/DescriptionScroll" unique_id=95908581]
+custom_minimum_size = Vector2(0, 520)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 24
+text = "プレイヤーの性能"
+autowrap_mode = 3
+
+[node name="CloseButton" type="TextureButton" parent="PlayerDetailPopup/MarginContainer/VBoxContainer" unique_id=504270374]
+custom_minimum_size = Vector2(300, 97)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource("10_close")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="BattleRetryButton" type="TextureButton" parent="." unique_id=307465309]
+z_index = 150
+layout_mode = 0
+offset_left = 30.0
+offset_top = 25.0
+offset_right = 300.0
+offset_bottom = 112.0
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource("7_retry")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="DebugWinButton" type="Button" parent="." unique_id=1096427096]
+visible = false
+z_index = 150
+layout_mode = 0
+offset_left = 30.0
+offset_top = 130.0
+offset_right = 300.0
+offset_bottom = 194.0
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_font_sizes/font_size = 24
+text = "デバッグ：即勝利"
+
+[node name="RetryConfirmation" type="Control" parent="." unique_id=1495523613]
+process_mode = 3
+visible = false
+z_index = 500
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="DimBackground" type="ColorRect" parent="RetryConfirmation" unique_id=875409055]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.45)
+
+[node name="Panel" type="NinePatchRect" parent="RetryConfirmation" unique_id=36394511]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -440.0
+offset_top = -260.0
+offset_right = 440.0
+offset_bottom = 260.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("9_purple_slice")
+patch_margin_left = 80
+patch_margin_top = 80
+patch_margin_right = 80
+patch_margin_bottom = 80
+
+[node name="Content" type="VBoxContainer" parent="RetryConfirmation/Panel" unique_id=297813942]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 100.0
+offset_top = 90.0
+offset_right = -100.0
+offset_bottom = -90.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 50
+
+[node name="Message" type="Label" parent="RetryConfirmation/Panel/Content" unique_id=1899461156]
+custom_minimum_size = Vector2(0, 150)
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "やりなおしますか？"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Buttons" type="HBoxContainer" parent="RetryConfirmation/Panel/Content" unique_id=1541131609]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 40
+alignment = 1
+
+[node name="RetryButton" type="TextureButton" parent="RetryConfirmation/Panel/Content/Buttons" unique_id=1826635312]
+custom_minimum_size = Vector2(300, 97)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource("7_retry")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="CancelButton" type="TextureButton" parent="RetryConfirmation/Panel/Content/Buttons" unique_id=967019126]
+custom_minimum_size = Vector2(300, 97)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource("8_cancel")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="VictoryDisplay" type="VBoxContainer" parent="." unique_id=2028048495]
+visible = false
+z_index = 100
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -170.0
+offset_right = 300.0
+offset_bottom = 170.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 28
+
+[node name="VictoryLabel" type="Label" parent="VictoryDisplay" unique_id=300112372]
+custom_minimum_size = Vector2(600, 120)
+layout_mode = 2
+theme_override_font_sizes/font_size = 72
+text = "勝利！"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="NextButton" type="TextureButton" parent="VictoryDisplay" unique_id=1948138247]
+custom_minimum_size = Vector2(450, 145)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource("6_next")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="DefeatDisplay" type="VBoxContainer" parent="." unique_id=585839474]
+visible = false
+z_index = 100
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -170.0
+offset_right = 300.0
+offset_bottom = 170.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 28
+
+[node name="DefeatLabel" type="Label" parent="DefeatDisplay" unique_id=1843379028]
+custom_minimum_size = Vector2(600, 120)
+layout_mode = 2
+theme_override_font_sizes/font_size = 72
+text = "敗北……"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="RetryButton" type="TextureButton" parent="DefeatDisplay" unique_id=2032647404]
+custom_minimum_size = Vector2(450, 145)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource("7_retry")
+ignore_texture_size = true
+stretch_mode = 5
