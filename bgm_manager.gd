@@ -3,6 +3,7 @@ extends Node
 const SILENT_VOLUME_DB := -80.0
 const DEFAULT_BGM_VOLUME_PERCENT := 20.0
 const DEFAULT_SE_VOLUME_PERCENT := 50.0
+const SE_OUTPUT_GAIN_DB := 6.0206
 
 var players: Array[AudioStreamPlayer] = []
 var active_player_index := 0
@@ -49,7 +50,10 @@ func _apply_bus_volume(bus_name: StringName, value: float) -> void:
 	var bus_index := AudioServer.get_bus_index(bus_name)
 	if bus_index == -1:
 		return
-	AudioServer.set_bus_volume_db(bus_index, linear_to_db(value / 100.0))
+	var volume_db: float = linear_to_db(value / 100.0)
+	if bus_name == &"SE" and not is_zero_approx(value):
+		volume_db += SE_OUTPUT_GAIN_DB
+	AudioServer.set_bus_volume_db(bus_index, volume_db)
 	AudioServer.set_bus_mute(bus_index, is_zero_approx(value))
 
 

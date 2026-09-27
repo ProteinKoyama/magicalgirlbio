@@ -6,9 +6,9 @@ extends RefCounted
 ## charactersへ {"id": キャラクターID, "expression": 表情名} を並べると、人数に応じて立ち位置が自動調整される。
 
 const PROLOGUE_PAGES: Array[Dictionary] = [
-	{"speaker": "", "speaker_id": "", "text": "魔法少女の朝は、魔力の補給から始まる。\n今日も街のどこかで、エネルギーが生まれている。", "characters": [{"id": "bio", "expression": "default"}]},
+	{"speaker": "", "speaker_id": "", "text": "魔法少女の朝は、魔力の補給から始まる。\n今日も街のどこかで、エネルギーが生まれている。", "characters": [{"id": "bio", "expression": "default"}, {"id": "mascot", "expression": "default"}]},
 	{"speaker": "ばいお", "speaker_id": "bio", "text": "この世の魔力はすべて私のもの！\n他の魔法少女には与えないわ！", "characters": [{"id": "bio", "expression": "emphasis"}, {"id": "mascot", "expression": "default"}]},
-	{"speaker": "ウバルン", "speaker_id": "mascot", "text": "それなら、こっちが先に強奪えればいいんだね！", "characters": [{"id": "bio", "expression": "default"}, {"id": "mascot", "expression": "default"}]},
+	{"speaker": "ウバルン", "speaker_id": "mascot", "text": "それなら、こっちが先に奪えばいいんだね！", "characters": [{"id": "bio", "expression": "default"}, {"id": "mascot", "expression": "default"}]},
 	{"speaker": "ばいお", "speaker_id": "bio", "text": "そう！ 魔力は取り合い、チャンスは奪い合い！", "characters": [{"id": "bio", "expression": "gesture"}, {"id": "mascot", "expression": "default"}]},
 	{"speaker": "ばいお", "speaker_id": "bio", "text": "なのに、\"ぎふと\"とかいう魔法少女が皆に魔力を分け与えているわ！許せん！", "characters": [{"id": "bio", "expression": "gesture"}, {"id": "mascot", "expression": "default"}]},
 	{"speaker": "", "speaker_id": "", "text": "こうして、魔法少女の強奪戦が幕を開ける。\n強奪え！ 魔法少女ばいお！", "characters": [{"id": "bio", "expression": "default"}, {"id": "mascot", "expression": "default"}]}
@@ -16,12 +16,17 @@ const PROLOGUE_PAGES: Array[Dictionary] = [
 
 const BATTLE_STORY_PAGES: Array = [
 	[
-		{"speaker": "", "speaker_id": "", "text": "スライムの魔力を奪った。\n微々たるものだが無いよりはマシだろう。", "characters": [{"id": "bio", "expression": "emphasis"}]},
-		{"speaker": "ばいお", "speaker_id": "bio", "text": "次はもっと大きな獲物よ。\n他の魔法少女に勝つために魔力を集めるわ！", "characters": [{"id": "bio", "expression": "emphasis"}]}
+		{"speaker": "", "speaker_id": "", "text": "スライムの魔力を奪った。\n微々たるものだが無いよりはマシだろう。", "characters": [{"id": "bio", "expression": "default"}, {"id": "mascot", "expression": "default"}]},
+		{"speaker": "ばいお", "speaker_id": "bio", "text": "次はもっと大きな獲物よ。\n他の魔法少女に勝つために魔力を集めるわ！", "characters": [{"id": "bio", "expression": "emphasis"}, {"id": "mascot", "expression": "default"}]}
 	],
 	[
-		{"speaker": "ばいお", "speaker_id": "bio", "text": "なんか力を蓄えてた不審者を倒したわ！", "characters": [{"id": "bio", "expression": "emphasis"}]},
-		{"speaker": "", "speaker_id": "", "text": "更なる力を得たばいお。\n宿敵、魔法少女ぎふととの戦いは近い。", "characters": [{"id": "bio", "expression": "emphasis"}]}
+		{"speaker": "ばいお", "speaker_id": "bio", "text": "なんか力を蓄えてた不審者を倒したわ！", "characters": [{"id": "bio", "expression": "emphasis"}, {"id": "mascot", "expression": "default"}]},
+		{"speaker": "", "speaker_id": "", "text": "魔法少女ぎふとの使い魔、えんじぇるんが力を蓄えているという。\nばいおは次の獲物を見つけた。", "characters": [{"id": "bio", "expression": "emphasis"}, {"id": "mascot", "expression": "default"}]}
+	],
+	[
+		{"speaker": "ウバルン", "speaker_id": "mascot", "text": "魔法少女ぎふとを守っていたえんじぇるんを倒したね！", "characters": [{"id": "bio", "expression": "default"}, {"id": "mascot", "expression": "default"}]},
+		{"speaker": "ばいお", "speaker_id": "bio", "text": "十分な魔力が集まったわ！\n次はいよいよ魔法少女ぎふとね！", "characters": [{"id": "bio", "expression": "emphasis"}, {"id": "mascot", "expression": "default"}]},
+		{"speaker": "", "speaker_id": "", "text": "更なる力を得たばいお。\n宿敵、魔法少女ぎふととの決戦が迫る。", "characters": [{"id": "bio", "expression": "emphasis"}, {"id": "mascot", "expression": "default"}]}
 	]
 ]
 

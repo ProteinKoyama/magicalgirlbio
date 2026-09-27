@@ -33,12 +33,14 @@ const HP_RECOVERY_COLOR := Color(0.1, 1.0, 0.2)
 @onready var round_info: Label = $RoundInfo
 @onready var player_portrait: AnimatedSprite2D = $Player/AnimatedSprite2D
 @onready var player_click_area: Button = $PlayerClickArea
+@onready var player_barrier_icon: TextureRect = $Player/NameRow/BarrierIcon
 @onready var player_hp_text: Label = $Player/HPText
 @onready var player_hp_bar: ProgressBar = $Player/HP
 @onready var player_charge_text: Label = $Player/ChargeText
 @onready var player_charge_bar: ProgressBar = $Player/Charge
 @onready var enemy_name: Label = $Enemy/NameRow/Name
-@onready var enemy_poison_icon: TextureRect = $Enemy/NameRow/PoisonIcon
+@onready var enemy_poison_icon: TextureRect = $Enemy/NameRow/StatusIcons/PoisonIcon
+@onready var enemy_barrier_icon: TextureRect = $Enemy/NameRow/StatusIcons/BarrierIcon
 @onready var enemy_portrait: TextureRect = $Enemy/Portrait
 @onready var enemy_hp_text: Label = $Enemy/HPText
 @onready var enemy_hp_bar: ProgressBar = $Enemy/HP
@@ -71,6 +73,9 @@ const HP_RECOVERY_COLOR := Color(0.1, 1.0, 0.2)
 @onready var player_detail_close_button: TextureButton = $PlayerDetailPopup/MarginContainer/VBoxContainer/CloseButton
 @onready var attack_se_player: AudioStreamPlayer = $AttackSePlayer
 @onready var bomb_se_player: AudioStreamPlayer = $BombSePlayer
+@onready var charge_se_player: AudioStreamPlayer = $ChargeSePlayer
+@onready var mahou_se_player: AudioStreamPlayer = $MahouSePlayer
+@onready var player_special_effect: BattleSpecialEffect = $PlayerSpecialEffect
 
 var player_max_hp := 50
 var player_hp := 50
@@ -88,6 +93,8 @@ var energy_types: Array[String] = []
 var battle_finished := false
 var battle_data: Dictionary = {}
 var enemy_is_poisoned := false
+var enemy_barrier_active := false
+var player_barrier_active := false
 var poison_elapsed_turns := 0
 var player_animation_version := 0
 var hp_change_queue: Array[Dictionary] = []
@@ -217,7 +224,7 @@ func _take_energy(index: int, actor: String) -> void:
 	energy_buttons[index].visible = false
 	await _animate_energy_to_actor(index, actor)
 	energy_buttons[index].disabled = true
-	_apply_energy(actor, energy_type)
+	await _apply_energy(actor, energy_type)
 	_update_status()
 	await _wait_for_hp_change_queue()
 	if _check_battle_end():
@@ -266,6 +273,8 @@ func _animate_energy_to_actor(index: int, actor: String) -> void:
 	flying_energy.queue_free()
 
 func _apply_energy(actor: String, energy_type: String) -> void:
+	if energy_type == ENERGY_CHARGE:
+		charge_se_player.play()
 	if actor == "player":
 		if energy_type == ENERGY_ATTACK or energy_type == ENERGY_SKILL:
 			_play_player_animation(&"attack", 0.65)
@@ -282,7 +291,9 @@ func _apply_energy(actor: String, energy_type: String) -> void:
 		if player_charge >= MAX_CHARGE and enemy_hp > 0:
 			player_charge -= MAX_CHARGE
 			_play_player_animation(&"attack", 0.8)
-			_change_enemy_hp(-PLAYER_SPECIAL_DAMAGE)
+			mahou_se_player.play()
+			await player_special_effect.play_effect(enemy_portrait.get_global_rect().get_center())
+			_change_enemy_hp(-PLAYER_SPECIAL_DAMAGE, false)
 	else:
 		match energy_type:
 			ENERGY_ATTACK:
@@ -308,6 +319,10 @@ func _apply_enemy_skill() -> void:
 			_change_enemy_hp(VAMPIRE_RECOVERY)
 		"present":
 			_change_enemy_hp(10)
+		"barrier":
+			if not enemy_barrier_active:
+				enemy_barrier_active = true
+				enemy_barrier_icon.show()
 
 func _apply_enemy_special() -> void:
 	match str(battle_data.get("special_id", "")):
@@ -317,6 +332,9 @@ func _apply_enemy_special() -> void:
 			_change_enemy_hp(enemy_max_hp - enemy_hp)
 		"death_gift":
 			_change_player_hp(-50)
+		"angel_arrow":
+			_change_player_hp(-30)
+			_change_enemy_hp(10)
 
 func _apply_player_skill() -> void:
 	match GameFlow.selected_skill:
@@ -326,10 +344,7 @@ func _apply_player_skill() -> void:
 			enemy_charge -= stolen_charge
 			player_charge += stolen_charge
 		"猛毒":
-			if not enemy_is_poisoned:
-				enemy_is_poisoned = true
-				poison_elapsed_turns = 0
-				enemy_poison_icon.show()
+			_apply_poison_to_enemy()
 		"スキルチャージ":
 			player_charge += BASE_CHARGE_GAIN
 		"魔力吸収":
@@ -339,6 +354,10 @@ func _apply_player_skill() -> void:
 		"吸血":
 			_change_enemy_hp(-VAMPIRE_DAMAGE)
 			_change_player_hp(VAMPIRE_RECOVERY)
+		"バリア":
+			if not player_barrier_active:
+				player_barrier_active = true
+				player_barrier_icon.show()
 		_:
 			_change_enemy_hp(-PLAYER_SKILL_DAMAGE)
 
@@ -353,6 +372,13 @@ func _apply_trait(action: String) -> void:
 			_play_player_animation(&"attack", 0.65)
 			_change_enemy_hp(-PLAYER_ATTACK_DAMAGE)
 
+func _apply_poison_to_enemy() -> void:
+	if enemy_is_poisoned:
+		return
+	enemy_is_poisoned = true
+	poison_elapsed_turns = 0
+	enemy_poison_icon.show()
+
 func _apply_poison_at_round_end() -> void:
 	if not enemy_is_poisoned or enemy_hp <= 0:
 		return
@@ -361,6 +387,10 @@ func _apply_poison_at_round_end() -> void:
 	poison_elapsed_turns += 1
 
 func _change_player_hp(amount: int) -> int:
+	if amount < 0 and player_barrier_active:
+		player_barrier_active = false
+		player_barrier_icon.hide()
+		return 0
 	var previous_hp := player_hp
 	player_hp = clampi(player_hp + amount, 0, player_max_hp)
 	var actual_change := player_hp - previous_hp
@@ -373,6 +403,10 @@ func _change_player_hp(amount: int) -> int:
 	return actual_change
 
 func _change_enemy_hp(amount: int, play_attack_se: bool = true) -> int:
+	if amount < 0 and enemy_barrier_active:
+		enemy_barrier_active = false
+		enemy_barrier_icon.hide()
+		return 0
 	var previous_hp := enemy_hp
 	enemy_hp = clampi(enemy_hp + amount, 0, enemy_max_hp)
 	var actual_change := enemy_hp - previous_hp
@@ -413,7 +447,7 @@ func _display_hp_change(actor: String, amount: int, is_recovery: bool) -> void:
 	popup.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	popup.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	popup.z_index = 300
-	popup.add_theme_font_size_override("font_size", 64)
+	popup.add_theme_font_size_override("font_size", 100)
 	popup.add_theme_constant_override("outline_size", 8)
 	popup.add_theme_color_override("font_outline_color", Color.BLACK)
 	popup.add_theme_color_override("font_color", HP_RECOVERY_COLOR if is_recovery else HP_DAMAGE_COLOR)
@@ -486,7 +520,11 @@ func _check_battle_end() -> bool:
 	return false
 
 func _finish_battle(player_won: bool) -> void:
+	if battle_finished:
+		return
 	battle_finished = true
+	if player_won:
+		GameFlow.record_battle_victory(round_number)
 	if enemy_detail_popup.visible:
 		enemy_detail_popup.hide()
 	if player_detail_popup.visible:

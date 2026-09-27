@@ -20,6 +20,7 @@ config/icon="res://icon.svg"
 GameFlow="*res://game_flow.gd"
 BgmManager="*res://bgm_manager.gd"
 SceneTransition="*res://scene_transition.tscn"
+UnityroomScoreClient="*res://unityroom_score_client.gd"
 
 [display]
 
