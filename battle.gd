@@ -52,6 +52,9 @@ const HP_RECOVERY_COLOR := Color(0.1, 1.0, 0.2)
 @onready var selection_detail_description: Label = $SelectionDetail/MarginContainer/VBoxContainer/Description
 @onready var victory_display: VBoxContainer = $VictoryDisplay
 @onready var continue_button: TextureButton = $VictoryDisplay/NextButton
+@onready var reward_popup: Control = $RewardPopup
+@onready var reward_message: Label = $RewardPopup/Panel/Content/Message
+@onready var reward_next_button: TextureButton = $RewardPopup/Panel/Content/NextButton
 @onready var defeat_display: VBoxContainer = $DefeatDisplay
 @onready var retry_button: TextureButton = $DefeatDisplay/RetryButton
 @onready var battle_retry_button: TextureButton = $BattleRetryButton
@@ -123,6 +126,7 @@ func _ready() -> void:
 	for i in energy_buttons.size():
 		energy_buttons[i].pressed.connect(_on_energy_pressed.bind(i))
 	continue_button.pressed.connect(GameFlow.finish_battle)
+	reward_next_button.pressed.connect(GameFlow.finish_battle)
 	retry_button.pressed.connect(_retry_battle)
 	battle_retry_button.pressed.connect(_open_retry_confirmation)
 	debug_win_button.visible = OS.is_debug_build()
@@ -498,8 +502,18 @@ func _finish_battle(player_won: bool) -> void:
 		defeat_display.hide()
 		bomb_se_player.play()
 		await _play_enemy_defeat_animation()
-		victory_display.show()
+		if GameFlow.battle_index < GameFlow.BATTLES.size() - 1:
+			var reward_skill := str(battle_data.get("reward_skill", ""))
+			reward_message.text = "%sの能力を強奪した！" % str(battle_data.get("name", "敵"))
+			if not reward_skill.is_empty():
+				reward_message.text += "\n獲得スキル：%s" % reward_skill
+			reward_popup.show()
+			reward_next_button.grab_focus()
+		else:
+			victory_display.show()
+			continue_button.grab_focus()
 	else:
+		reward_popup.hide()
 		victory_display.hide()
 		defeat_display.show()
 
@@ -610,7 +624,7 @@ func _retry_battle() -> void:
 	retry_confirmation_open = false
 	enemy_detail_open = false
 	player_detail_open = false
-	get_tree().change_scene_to_file("res://battle_prep.tscn")
+	SceneTransition.change_scene_to_file("res://battle_prep.tscn")
 
 func _exit_tree() -> void:
 	if retry_confirmation_open:

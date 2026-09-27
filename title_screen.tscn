@@ -3,8 +3,8 @@
 [ext_resource type="FontFile" uid="uid://baywwgegtnssu" path="res://Assets/AkazukiPOP.otf" id="2_ig5kc"]
 [ext_resource type="Script" uid="uid://bwx20nv5xrdpw" path="res://title_screen.gd" id="3_script"]
 [ext_resource type="Texture2D" uid="uid://xnbpaamga0wr" path="res://Assets/01122_1_1.png" id="4_credit_icon"]
-[ext_resource type="Texture2D" path="res://Assets/start_button_jp.png" id="5_start_button"]
-[ext_resource type="Texture2D" path="res://Assets/credit_button_jp.png" id="6_credit_button"]
+[ext_resource type="Texture2D" uid="uid://c1ilhmqmcxwup" path="res://Assets/start_button_jp.png" id="5_start_button"]
+[ext_resource type="Texture2D" uid="uid://da1e8tns1i5ad" path="res://Assets/credit_button_jp.png" id="6_credit_button"]
 [ext_resource type="Texture2D" uid="uid://b564tjjoeus27" path="res://Assets/logo.png" id="7_jqemp"]
 [ext_resource type="Texture2D" uid="uid://dt47sxemktdes" path="res://Assets/purpleslice.png" id="8_purple_slice"]
 [ext_resource type="Texture2D" uid="uid://dhxf0qt6slaef" path="res://Assets/volume_bar.png" id="9_volume_bar"]
@@ -92,7 +92,7 @@ anchor_right = 1.0
 offset_left = -603.0
 offset_top = 60.0
 offset_right = -61.0
-offset_bottom = 300.0
+offset_bottom = 263.0
 grow_horizontal = 0
 texture = ExtResource("8_purple_slice")
 patch_margin_left = 80

@@ -31,9 +31,9 @@ var portrait_nodes: Dictionary = {}
 
 
 ## プロローグ・ストーリー・エンディングで共通の入口。
-static func play(tree: SceneTree, json_path: String) -> Error:
+static func play(_tree: SceneTree, json_path: String) -> Error:
 	requested_dialogue_path = json_path
-	var result := tree.change_scene_to_file("res://dialogue.tscn")
+	var result: Error = SceneTransition.change_scene_to_file("res://dialogue.tscn")
 	if result != OK:
 		requested_dialogue_path = ""
 	return result
@@ -175,14 +175,14 @@ func _finish() -> void:
 		title_return_button.grab_focus()
 		return
 	finished = true
-	var result := get_tree().change_scene_to_file(next_scene)
+	var result: Error = SceneTransition.change_scene_to_file(next_scene)
 	if result != OK:
 		finished = false
 		push_error("会話の終了後に遷移できません: %s (error %d)" % [next_scene, result])
 
 
 func _return_to_title() -> void:
-	var result := get_tree().change_scene_to_file(next_scene)
+	var result: Error = SceneTransition.change_scene_to_file(next_scene)
 	if result != OK:
 		push_error("タイトル画面へ遷移できません: %s (error %d)" % [next_scene, result])
 

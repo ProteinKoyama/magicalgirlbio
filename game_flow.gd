@@ -55,7 +55,7 @@ func current_battle() -> Dictionary:
 	return BATTLES[clampi(battle_index, 0, BATTLES.size() - 1)]
 
 func start_next_battle() -> void:
-	get_tree().change_scene_to_file("res://battle.tscn")
+	SceneTransition.change_scene_to_file("res://battle.tscn")
 
 func finish_battle() -> void:
 	var data := current_battle()
@@ -66,10 +66,10 @@ func finish_battle() -> void:
 	if data["story_after"]:
 		story_index = battle_index - 1
 		DialogueScene.requested_dialogue_path = "story"
-		get_tree().change_scene_to_file("res://dialogue.tscn")
+		SceneTransition.change_scene_to_file("res://dialogue.tscn")
 	else:
 		DialogueScene.requested_dialogue_path = "ending"
-		get_tree().change_scene_to_file("res://dialogue.tscn")
+		SceneTransition.change_scene_to_file("res://dialogue.tscn")
 
 func finish_story() -> void:
-	get_tree().change_scene_to_file("res://battle_prep.tscn")
+	SceneTransition.change_scene_to_file("res://battle_prep.tscn")
