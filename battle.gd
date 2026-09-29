@@ -12,12 +12,12 @@ const ENERGY_NAMES := {
 	ENERGY_SKILL: "スキル魔力",
 	ENERGY_CHARGE: "チャージ魔力"
 }
-const MAX_CHARGE := 8
+const MAX_CHARGE := 10
 const PLAYER_ATTACK_DAMAGE := 5
 const PLAYER_SKILL_DAMAGE := 5
 const PLAYER_SPECIAL_DAMAGE := 40
 const VAMPIRE_DAMAGE := 5
-const VAMPIRE_RECOVERY := 3
+const VAMPIRE_CHARGE_GAIN := 1
 const BASE_CHARGE_GAIN := 2
 const ENEMY_PORTRAIT_WIDTH := 600.0
 const ENEMY_DEFEAT_ANIMATION_FRAMES := 60
@@ -26,6 +26,11 @@ const ENEMY_DETAIL_POPUP_SIZE := Vector2i(880, 560)
 const PLAYER_DETAIL_POPUP_SIZE := Vector2i(980, 800)
 const HP_CHANGE_POPUP_SIZE := Vector2(220, 90)
 const HP_CHANGE_POPUP_GAP := 12.0
+const HP_CHANGE_POPUP_FAST_MOVE_DURATION := 0.2
+const HP_CHANGE_POPUP_FAST_FADE_DURATION := 0.15
+const HP_CHANGE_POPUP_FAST_HOLD_DURATION := 0.4
+const DAMAGE_RECOIL_DISTANCE := 10.0
+const DAMAGE_RECOIL_FRAME_DURATION := 1.0 / 60.0
 const HP_DAMAGE_COLOR := Color(1.0, 0.12, 0.12)
 const HP_RECOVERY_COLOR := Color(0.1, 1.0, 0.2)
 
@@ -75,6 +80,7 @@ const HP_RECOVERY_COLOR := Color(0.1, 1.0, 0.2)
 @onready var bomb_se_player: AudioStreamPlayer = $BombSePlayer
 @onready var charge_se_player: AudioStreamPlayer = $ChargeSePlayer
 @onready var mahou_se_player: AudioStreamPlayer = $MahouSePlayer
+@onready var orbup_se_player: AudioStreamPlayer = $OrbUpSePlayer
 @onready var player_special_effect: BattleSpecialEffect = $PlayerSpecialEffect
 
 var player_max_hp := 50
@@ -89,6 +95,7 @@ var first_actor := "player"
 var current_actor := "player"
 var picks_taken := 0
 var selected_energy_index := -1
+var energy_highlight_tween: Tween
 var energy_types: Array[String] = []
 var battle_finished := false
 var battle_data: Dictionary = {}
@@ -99,6 +106,8 @@ var poison_elapsed_turns := 0
 var player_animation_version := 0
 var hp_change_queue: Array[Dictionary] = []
 var hp_change_queue_active := false
+var damage_recoil_home_positions: Dictionary = {}
+var damage_recoil_tweens: Dictionary = {}
 var retry_confirmation_open := false
 var enemy_detail_open := false
 var player_detail_open := false
@@ -163,10 +172,38 @@ func _start_round() -> void:
 		var button := energy_buttons[i]
 		button.texture_normal = load(GameFlow.ENERGY_IMAGES[ENERGY_TYPES.find(energy_type)])
 		button.visible = true
-		button.disabled = false
-		button.modulate = Color.WHITE
+		button.disabled = true
+		button.modulate = Color(1.0, 1.0, 1.0, 0.0)
 	round_info.text = "ラウンド %d　%s先攻" % [round_number, _actor_name(first_actor)]
+	await _animate_round_energies()
+	if battle_finished:
+		return
 	_begin_actor_pick()
+
+func _animate_round_energies() -> void:
+	await get_tree().process_frame
+	var target_positions: Array[Vector2] = []
+	for button: TextureButton in energy_buttons:
+		target_positions.append(button.position)
+		button.position += Vector2(0.0, 60.0)
+		button.modulate.a = 0.0
+	if not energy_buttons.is_empty():
+		orbup_se_player.play()
+
+	var appearance_tweens: Array[Tween] = []
+	for i in energy_buttons.size():
+		var button: TextureButton = energy_buttons[i]
+		var tween := create_tween()
+		tween.set_trans(Tween.TRANS_CUBIC)
+		tween.set_ease(Tween.EASE_OUT)
+		tween.tween_property(button, "position", target_positions[i], 0.3)
+		tween.parallel().tween_property(button, "modulate:a", 1.0, 0.3)
+		appearance_tweens.append(tween)
+		if i < energy_buttons.size() - 1:
+			await get_tree().create_timer(0.08).timeout
+
+	if not appearance_tweens.is_empty():
+		await appearance_tweens.back().finished
 
 func _begin_actor_pick() -> void:
 	selected_energy_index = -1
@@ -185,7 +222,7 @@ func _on_energy_pressed(index: int) -> void:
 	if selected_energy_index != index:
 		selected_energy_index = index
 		_reset_energy_highlight()
-		energy_buttons[index].modulate = Color(1.25, 1.25, 0.55, 1.0)
+		_start_energy_blink(index)
 		instruction.text = "%sを選択中。もう一度クリックで確定" % ENERGY_NAMES[energy_types[index]]
 		_show_energy_selection_detail(energy_types[index])
 		return
@@ -219,6 +256,7 @@ func _take_energy(index: int, actor: String) -> void:
 	var energy_type := energy_types[index]
 	energy_types[index] = ""
 	selected_energy_index = -1
+	_reset_energy_highlight()
 	selection_detail.hide()
 	_set_energy_buttons_enabled(false)
 	energy_buttons[index].visible = false
@@ -316,7 +354,7 @@ func _apply_enemy_skill() -> void:
 			enemy_charge += 1
 		"vampire":
 			_change_player_hp(-VAMPIRE_DAMAGE)
-			_change_enemy_hp(VAMPIRE_RECOVERY)
+			enemy_charge += VAMPIRE_CHARGE_GAIN
 		"present":
 			_change_enemy_hp(10)
 		"barrier":
@@ -353,7 +391,7 @@ func _apply_player_skill() -> void:
 			player_charge += 1
 		"吸血":
 			_change_enemy_hp(-VAMPIRE_DAMAGE)
-			_change_player_hp(VAMPIRE_RECOVERY)
+			player_charge += VAMPIRE_CHARGE_GAIN
 		"バリア":
 			if not player_barrier_active:
 				player_barrier_active = true
@@ -396,6 +434,7 @@ func _change_player_hp(amount: int) -> int:
 	var actual_change := player_hp - previous_hp
 	if actual_change < 0:
 		attack_se_player.play()
+		_play_damage_recoil("player")
 		_play_player_animation(&"damaged", 0.75)
 		_show_hp_change("player", actual_change, false)
 	elif actual_change > 0:
@@ -411,25 +450,46 @@ func _change_enemy_hp(amount: int, play_attack_se: bool = true) -> int:
 	enemy_hp = clampi(enemy_hp + amount, 0, enemy_max_hp)
 	var actual_change := enemy_hp - previous_hp
 	if actual_change != 0:
+		if actual_change < 0:
+			_play_damage_recoil("enemy")
 		if actual_change < 0 and play_attack_se:
 			attack_se_player.play()
 		_show_hp_change("enemy", actual_change, actual_change > 0)
 	return actual_change
 
+func _play_damage_recoil(actor: String) -> void:
+	var portrait: CanvasItem = player_portrait if actor == "player" else enemy_portrait
+	var portrait_id: int = portrait.get_instance_id()
+	var home_position: Vector2 = damage_recoil_home_positions.get(portrait_id, portrait.get("position"))
+	damage_recoil_home_positions[portrait_id] = home_position
+	var active_tween: Variant = damage_recoil_tweens.get(portrait_id)
+	if active_tween is Tween and (active_tween as Tween).is_valid():
+		(active_tween as Tween).kill()
+	portrait.set("position", home_position)
+	var recoil_direction := -1.0 if actor == "player" else 1.0
+	var recoil_position := home_position + Vector2(recoil_direction * DAMAGE_RECOIL_DISTANCE, 0.0)
+	var tween := create_tween()
+	damage_recoil_tweens[portrait_id] = tween
+	tween.tween_property(portrait, "position", recoil_position, DAMAGE_RECOIL_FRAME_DURATION).set_trans(Tween.TRANS_LINEAR)
+	tween.tween_property(portrait, "position", home_position, DAMAGE_RECOIL_FRAME_DURATION * 5.0).set_trans(Tween.TRANS_LINEAR)
+	tween.finished.connect(func() -> void: damage_recoil_tweens.erase(portrait_id))
+
 func _show_hp_change(actor: String, amount: int, is_recovery: bool) -> void:
 	hp_change_queue.append({"actor": actor, "amount": amount, "is_recovery": is_recovery})
 	if not hp_change_queue_active:
-		_process_hp_change_queue()
+		hp_change_queue_active = true
+		_set_energy_buttons_enabled(false)
+		_process_hp_change_queue.call_deferred()
 
 func _process_hp_change_queue() -> void:
-	hp_change_queue_active = true
-	_set_energy_buttons_enabled(false)
+	var shorten_displays := hp_change_queue.size() >= 2
 	while not hp_change_queue.is_empty():
 		var popup_data: Dictionary = hp_change_queue.pop_front()
 		await _display_hp_change(
 			str(popup_data["actor"]),
 			int(popup_data["amount"]),
-			bool(popup_data["is_recovery"])
+			bool(popup_data["is_recovery"]),
+			shorten_displays
 		)
 	hp_change_queue_active = false
 	hp_change_queue_finished.emit()
@@ -438,7 +498,7 @@ func _wait_for_hp_change_queue() -> void:
 	if hp_change_queue_active:
 		await hp_change_queue_finished
 
-func _display_hp_change(actor: String, amount: int, is_recovery: bool) -> void:
+func _display_hp_change(actor: String, amount: int, is_recovery: bool, shorten_display: bool = false) -> void:
 	var popup := Label.new()
 	popup.text = "+%d" % amount if amount > 0 else str(amount)
 	popup.custom_minimum_size = HP_CHANGE_POPUP_SIZE
@@ -465,10 +525,13 @@ func _display_hp_change(actor: String, amount: int, is_recovery: bool) -> void:
 	var tween := create_tween()
 	tween.set_trans(Tween.TRANS_QUAD)
 	tween.set_ease(Tween.EASE_OUT)
-	tween.tween_property(popup, "global_position", target_position, 0.4)
-	tween.parallel().tween_property(popup, "modulate:a", 1.0, 0.25)
-	tween.tween_interval(1.35)
-	tween.tween_property(popup, "modulate:a", 0.0, 0.25)
+	var move_duration := HP_CHANGE_POPUP_FAST_MOVE_DURATION if shorten_display else 0.4
+	var fade_duration := HP_CHANGE_POPUP_FAST_FADE_DURATION if shorten_display else 0.25
+	var hold_duration := HP_CHANGE_POPUP_FAST_HOLD_DURATION if shorten_display else 1.35
+	tween.tween_property(popup, "global_position", target_position, move_duration)
+	tween.parallel().tween_property(popup, "modulate:a", 1.0, fade_duration)
+	tween.tween_interval(hold_duration)
+	tween.tween_property(popup, "modulate:a", 0.0, fade_duration)
 	await tween.finished
 	popup.queue_free()
 
@@ -687,9 +750,18 @@ func _set_energy_buttons_enabled(enabled: bool) -> void:
 		energy_buttons[i].disabled = not enabled or hp_change_queue_active or not _is_energy_available(i)
 
 func _reset_energy_highlight() -> void:
+	if energy_highlight_tween != null and energy_highlight_tween.is_valid():
+		energy_highlight_tween.kill()
+	energy_highlight_tween = null
 	for button in energy_buttons:
 		button.modulate = Color.WHITE
 	selection_detail.hide()
+
+func _start_energy_blink(index: int) -> void:
+	var selected_button: TextureButton = energy_buttons[index]
+	energy_highlight_tween = create_tween().set_loops()
+	energy_highlight_tween.tween_property(selected_button, "modulate", Color(2.0, 2.0, 2.0, 1.0), 0.25)
+	energy_highlight_tween.tween_property(selected_button, "modulate", Color.WHITE, 0.25)
 
 func _show_energy_selection_detail(energy_type: String) -> void:
 	var equipped_trait: String = str(GameFlow.selected_traits.get(energy_type, "なし"))

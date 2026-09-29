@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://dxxoncbl7jyk" path="res://Assets/09251.png" id="4_mhv3b"]
 [ext_resource type="FontFile" uid="uid://baywwgegtnssu" path="res://Assets/AkazukiPOP.otf" id="5_lcjiy"]
 [ext_resource type="Texture2D" uid="uid://duirtvt4mwllq" path="res://Assets/nextButton.png" id="6_next"]
+[ext_resource type="Texture2D" uid="uid://b5mq0sdftsnmo" path="res://Assets/battle_background.png" id="7_22sa7"]
 [ext_resource type="Texture2D" uid="uid://bufthwq88o17h" path="res://Assets/retryButton.png" id="7_retry"]
 [ext_resource type="Texture2D" uid="uid://c5fb8s7iwsemc" path="res://Assets/cancelButton.png" id="8_cancel"]
 [ext_resource type="Texture2D" uid="uid://dt47sxemktdes" path="res://Assets/purpleslice.png" id="9_purple_slice"]
@@ -18,6 +19,7 @@
 [ext_resource type="AudioStream" uid="uid://byevv6md1vl7w" path="res://Assets/mahou.mp3" id="15_mahou_se"]
 [ext_resource type="Script" uid="uid://bg4tcvfcyoya2" path="res://battle_special_effect.gd" id="16_special_effect"]
 [ext_resource type="Texture2D" uid="uid://o730gicryknf" path="res://Assets/barrier_mirror.svg" id="17_barrier_icon"]
+[ext_resource type="AudioStream" uid="uid://ysrawwufh3ex" path="res://Assets/orbup.mp3" id="18_orbup_se"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_7g1a8"]
 animations = [{
@@ -49,6 +51,9 @@ animations = [{
 [sub_resource type="LabelSettings" id="LabelSettings_p22n3"]
 font = ExtResource("5_lcjiy")
 font_size = 52
+font_color = Color(1, 1, 1, 1)
+outline_color = Color(0, 0, 0, 1)
+outline_size = 5
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_fill"]
 bg_color = Color(0.117647, 0.8, 0.25098, 1)
@@ -84,6 +89,21 @@ resource_local_to_scene = true
 shader = SubResource("Shader_enemy_defeat")
 shader_parameter/shake_offset = 0.0
 shader_parameter/disappear_progress = 0.0
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_selection_slice"]
+atlas = ExtResource("9_purple_slice")
+region = Rect2(5, 5, 542, 539)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_selection_detail"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+texture = SubResource("AtlasTexture_selection_slice")
+texture_margin_left = 75.0
+texture_margin_top = 75.0
+texture_margin_right = 75.0
+texture_margin_bottom = 75.0
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_purple_slice"]
 content_margin_left = 0.0
@@ -124,6 +144,10 @@ bus = &"SE"
 stream = ExtResource("15_mahou_se")
 bus = &"SE"
 
+[node name="OrbUpSePlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("18_orbup_se")
+bus = &"SE"
+
 [node name="PlayerSpecialEffect" type="Control" parent="." unique_id=1559611379]
 z_index = 50
 layout_mode = 1
@@ -141,11 +165,18 @@ offset_right = 1931.0
 offset_bottom = 1087.0
 color = Color(0.5176471, 0.8509804, 1, 1)
 
+[node name="Sprite2D" type="Sprite2D" parent="ColorRect" unique_id=678241395]
+position = Vector2(965, 607)
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("7_22sa7")
+
 [node name="Title" type="Label" parent="." unique_id=2016646009]
 layout_mode = 0
 offset_top = 30.0
 offset_right = 1920.0
 offset_bottom = 90.0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
 theme_override_font_sizes/font_size = 38
 horizontal_alignment = 1
 
@@ -159,6 +190,8 @@ offset_top = 105.0
 offset_right = 650.0
 offset_bottom = 195.0
 grow_horizontal = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
 theme_override_font_sizes/font_size = 52
 text = "ラウンド 1　プレイヤー先攻"
 horizontal_alignment = 1
@@ -185,6 +218,8 @@ alignment = 1
 [node name="Name" type="Label" parent="Player/NameRow" unique_id=101198678]
 custom_minimum_size = Vector2(300, 44)
 layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
 theme_override_font_sizes/font_size = 28
 text = "ばいお"
 label_settings = SubResource("LabelSettings_p22n3")
@@ -202,6 +237,8 @@ stretch_mode = 5
 [node name="HPText" type="Label" parent="Player" unique_id=818144453]
 custom_minimum_size = Vector2(390, 51)
 layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
 theme_override_font_sizes/font_size = 30
 horizontal_alignment = 1
 
@@ -214,8 +251,10 @@ show_percentage = false
 [node name="ChargeText" type="Label" parent="Player" unique_id=278085515]
 custom_minimum_size = Vector2(390, 45)
 layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
 theme_override_font_sizes/font_size = 27
-text = "必殺チャージ 0 / 8"
+text = "必殺チャージ 0 / 10"
 horizontal_alignment = 1
 
 [node name="Charge" type="ProgressBar" parent="Player" unique_id=1522005918]
@@ -241,20 +280,23 @@ layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -550.0
+offset_left = -450.0
 offset_top = 150.0
 offset_right = -50.0
 offset_bottom = 906.0
 grow_horizontal = 0
 
 [node name="NameRow" type="HBoxContainer" parent="Enemy" unique_id=780033536]
-custom_minimum_size = Vector2(500, 44)
+custom_minimum_size = Vector2(400, 44)
 layout_mode = 2
+size_flags_horizontal = 8
 theme_override_constants/separation = 8
 alignment = 1
 
 [node name="Name" type="Label" parent="Enemy/NameRow" unique_id=522876077]
 layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
 theme_override_font_sizes/font_size = 28
 horizontal_alignment = 1
 
@@ -283,27 +325,35 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="HPText" type="Label" parent="Enemy" unique_id=401488011]
-custom_minimum_size = Vector2(390, 51)
+custom_minimum_size = Vector2(400, 51)
 layout_mode = 2
+size_flags_horizontal = 8
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
 theme_override_font_sizes/font_size = 30
 horizontal_alignment = 1
 
 [node name="HP" type="ProgressBar" parent="Enemy" unique_id=562241778]
-custom_minimum_size = Vector2(390, 39)
+custom_minimum_size = Vector2(400, 39)
 layout_mode = 2
+size_flags_horizontal = 8
 theme_override_styles/fill = SubResource("StyleBoxFlat_hp_fill")
 show_percentage = false
 
 [node name="ChargeText" type="Label" parent="Enemy" unique_id=492038661]
-custom_minimum_size = Vector2(390, 45)
+custom_minimum_size = Vector2(400, 45)
 layout_mode = 2
+size_flags_horizontal = 8
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
 theme_override_font_sizes/font_size = 27
-text = "必殺チャージ 0 / 8"
+text = "必殺チャージ 0 / 10"
 horizontal_alignment = 1
 
 [node name="Charge" type="ProgressBar" parent="Enemy" unique_id=2135336688]
-custom_minimum_size = Vector2(390, 33)
+custom_minimum_size = Vector2(400, 33)
 layout_mode = 2
+size_flags_horizontal = 8
 theme_override_styles/fill = SubResource("StyleBoxFlat_charge_fill")
 max_value = 8.0
 show_percentage = false
@@ -328,6 +378,8 @@ offset_top = 201.0
 offset_right = 397.0
 offset_bottom = 261.0
 grow_horizontal = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
 theme_override_font_sizes/font_size = 32
 text = "欲しい魔力をクリックし、もう一度クリックして確定"
 horizontal_alignment = 1
@@ -336,38 +388,38 @@ autowrap_mode = 3
 
 [node name="Energy" type="VBoxContainer" parent="." unique_id=1207583577]
 layout_mode = 0
-offset_left = 760.0
-offset_top = 285.0
-offset_right = 1160.0
-offset_bottom = 842.0
-theme_override_constants/separation = 8
+offset_left = 660.0
+offset_top = 262.0
+offset_right = 1260.0
+offset_bottom = 850.0
+theme_override_constants/separation = -50
 
 [node name="Energy1" type="TextureButton" parent="Energy" unique_id=1894933039]
-custom_minimum_size = Vector2(400, 105)
+custom_minimum_size = Vector2(600, 157.5)
 layout_mode = 2
 ignore_texture_size = true
 stretch_mode = 5
 
 [node name="Energy2" type="TextureButton" parent="Energy" unique_id=1038571753]
-custom_minimum_size = Vector2(400, 105)
+custom_minimum_size = Vector2(600, 157.5)
 layout_mode = 2
 ignore_texture_size = true
 stretch_mode = 5
 
 [node name="Energy3" type="TextureButton" parent="Energy" unique_id=1999899748]
-custom_minimum_size = Vector2(400, 105)
+custom_minimum_size = Vector2(600, 157.5)
 layout_mode = 2
 ignore_texture_size = true
 stretch_mode = 5
 
 [node name="Energy4" type="TextureButton" parent="Energy" unique_id=540413337]
-custom_minimum_size = Vector2(400, 105)
+custom_minimum_size = Vector2(600, 157.5)
 layout_mode = 2
 ignore_texture_size = true
 stretch_mode = 5
 
 [node name="Energy5" type="TextureButton" parent="Energy" unique_id=731490533]
-custom_minimum_size = Vector2(400, 105)
+custom_minimum_size = Vector2(600, 157.5)
 layout_mode = 2
 ignore_texture_size = true
 stretch_mode = 5
@@ -388,7 +440,7 @@ offset_bottom = -20.0
 grow_horizontal = 2
 grow_vertical = 0
 mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxTexture_purple_slice")
+theme_override_styles/panel = SubResource("StyleBoxTexture_selection_detail")
 
 [node name="MarginContainer" type="MarginContainer" parent="SelectionDetail" unique_id=48521647]
 layout_mode = 2
@@ -542,6 +594,8 @@ offset_right = 300.0
 offset_bottom = 194.0
 focus_mode = 0
 mouse_default_cursor_shape = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
 theme_override_font_sizes/font_size = 24
 text = "デバッグ：即勝利"
 
@@ -720,6 +774,8 @@ theme_override_constants/separation = 28
 [node name="VictoryLabel" type="Label" parent="VictoryDisplay" unique_id=300112372]
 custom_minimum_size = Vector2(600, 120)
 layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
 theme_override_font_sizes/font_size = 72
 text = "勝利！"
 horizontal_alignment = 1
@@ -754,6 +810,8 @@ theme_override_constants/separation = 28
 [node name="DefeatLabel" type="Label" parent="DefeatDisplay" unique_id=1843379028]
 custom_minimum_size = Vector2(600, 120)
 layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
 theme_override_font_sizes/font_size = 72
 text = "敗北……"
 horizontal_alignment = 1

@@ -9,7 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://dt47sxemktdes" path="res://Assets/purpleslice.png" id="8_purple_slice"]
 [ext_resource type="Texture2D" uid="uid://dhxf0qt6slaef" path="res://Assets/volume_bar.png" id="9_volume_bar"]
 [ext_resource type="Texture2D" uid="uid://bttksmxe1nsyd" path="res://Assets/volume_knob.png" id="10_volume_knob"]
-[ext_resource type="Texture2D" uid="uid://dpeu51kj1qal7" path="res://Assets/gaia_credit_placeholder.svg" id="11_gaia_icon"]
+[ext_resource type="Texture2D" uid="uid://b8r3wppkc7grl" path="res://Assets/IMG_3886.png" id="10_xfn3p"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_f175k"]
 texture = ExtResource("9_volume_bar")
@@ -205,7 +205,7 @@ grow_vertical = 2
 mouse_filter = 2
 
 [node name="Window" type="NinePatchRect" parent="CanvasLayer/CreditsOverlay/Center" unique_id=1400155140]
-custom_minimum_size = Vector2(1000, 820)
+custom_minimum_size = Vector2(1000, 900)
 layout_mode = 2
 theme = SubResource("Theme_credits")
 texture = ExtResource("8_purple_slice")
@@ -220,15 +220,15 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 90.0
-offset_top = 80.0
+offset_top = 60.0
 offset_right = -90.0
-offset_bottom = -80.0
+offset_bottom = -60.0
 grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Content" type="VBoxContainer" parent="CanvasLayer/CreditsOverlay/Center/Window/Padding" unique_id=3232662]
 layout_mode = 2
-theme_override_constants/separation = 20
+theme_override_constants/separation = 12
 alignment = 1
 
 [node name="Heading" type="Label" parent="CanvasLayer/CreditsOverlay/Center/Window/Padding/Content" unique_id=1345425262]
@@ -283,7 +283,7 @@ custom_minimum_size = Vector2(160, 160)
 layout_mode = 2
 size_flags_horizontal = 4
 mouse_filter = 2
-texture = ExtResource("11_gaia_icon")
+texture = ExtResource("10_xfn3p")
 expand_mode = 1
 stretch_mode = 5
 
@@ -308,6 +308,62 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "フォント：AkazukiPOP"
 horizontal_alignment = 1
+
+[node name="EngineLicensesScroll" type="ScrollContainer" parent="CanvasLayer/CreditsOverlay/Center/Window/Padding/Content" unique_id=2000265194]
+custom_minimum_size = Vector2(0, 180)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="EngineLicenses" type="VBoxContainer" parent="CanvasLayer/CreditsOverlay/Center/Window/Padding/Content/EngineLicensesScroll" unique_id=2000265195]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="FontLicenseText" type="Label" parent="CanvasLayer/CreditsOverlay/Center/Window/Padding/Content/EngineLicensesScroll/EngineLicenses" unique_id=2000265202]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+text = "Copyright (c) 2018, M+ FONTS PROJECT
+
+This Font Software is licensed under the SIL Open Font License, Version 1.1.
+
+--- SIL Open Font License Version 1.1 ---"
+autowrap_mode = 3
+
+[node name="MitLicenseHeading" type="Label" parent="CanvasLayer/CreditsOverlay/Center/Window/Padding/Content/EngineLicensesScroll/EngineLicenses" unique_id=2000265196]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Godot Engine MITライセンス"
+
+[node name="MitLicenseText" type="Label" parent="CanvasLayer/CreditsOverlay/Center/Window/Padding/Content/EngineLicensesScroll/EngineLicenses" unique_id=2000265197]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+autowrap_mode = 3
+
+[node name="ThirdPartyLicensesHeading" type="Label" parent="CanvasLayer/CreditsOverlay/Center/Window/Padding/Content/EngineLicensesScroll/EngineLicenses" unique_id=2000265198]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "第三者ライセンス情報"
+
+[node name="ThirdPartyLicenses" type="Label" parent="CanvasLayer/CreditsOverlay/Center/Window/Padding/Content/EngineLicensesScroll/EngineLicenses" unique_id=2000265199]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 16
+autowrap_mode = 3
+
+[node name="CopyrightHeading" type="Label" parent="CanvasLayer/CreditsOverlay/Center/Window/Padding/Content/EngineLicensesScroll/EngineLicenses" unique_id=2000265200]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "著作権情報"
+
+[node name="CopyrightInfo" type="Label" parent="CanvasLayer/CreditsOverlay/Center/Window/Padding/Content/EngineLicensesScroll/EngineLicenses" unique_id=2000265201]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 16
+autowrap_mode = 3
 
 [node name="CreditsCloseButton" type="Button" parent="CanvasLayer/CreditsOverlay/Center/Window/Padding/Content" unique_id=1919527083]
 unique_name_in_owner = true

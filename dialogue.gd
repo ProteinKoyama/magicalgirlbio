@@ -24,6 +24,7 @@ var finished: bool = false
 @onready var skip_button: TextureButton = %SkipButton
 @onready var bio_portrait: AnimatedSprite2D = %BioPortrait
 @onready var mascot_portrait: Sprite2D = %MascotPortrait
+@onready var ending_still: TextureRect = %EndingStill
 @onready var ending_popup: Control = %EndingPopup
 @onready var title_return_button: TextureButton = %TitleReturnButton
 
@@ -72,6 +73,7 @@ func _show_page() -> void:
 	var page := pages[page_index]
 	speaker_label.text = page["speaker"]
 	dialogue_label.text = page["text"]
+	ending_still.visible = str(page.get("background_image", "")) == "endingstill"
 	_update_portraits(page)
 
 func _update_portraits(page: Dictionary) -> void:

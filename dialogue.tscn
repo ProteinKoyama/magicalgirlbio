@@ -3,12 +3,14 @@
 [ext_resource type="Script" uid="uid://b86utso5wkn6v" path="res://dialogue.gd" id="1"]
 [ext_resource type="FontFile" uid="uid://baywwgegtnssu" path="res://Assets/AkazukiPOP.otf" id="2"]
 [ext_resource type="Texture2D" uid="uid://gh72jno4e8sm" path="res://Assets/SkipButton.png" id="3_758ep"]
+[ext_resource type="Texture2D" uid="uid://b5mq0sdftsnmo" path="res://Assets/battle_background.png" id="3_ajmj3"]
 [ext_resource type="Texture2D" uid="uid://bfhpf8nyyaobb" path="res://Assets/09252.png" id="3_q2h7b"]
 [ext_resource type="Texture2D" uid="uid://dxxoncbl7jyk" path="res://Assets/09251.png" id="4_iq77p"]
 [ext_resource type="Texture2D" uid="uid://du7t6rpxwer8b" path="res://Assets/09254.png" id="6_gesture"]
 [ext_resource type="Texture2D" uid="uid://ds3cl01day8v2" path="res://Assets/mascot.png" id="7_mascot"]
 [ext_resource type="Texture2D" uid="uid://dt47sxemktdes" path="res://Assets/purpleslice.png" id="8_purple_slice"]
 [ext_resource type="Texture2D" uid="uid://b4sfcpepckjav" path="res://Assets/titleReturnButton.png" id="9_title_return"]
+[ext_resource type="Texture2D" uid="uid://dqvm1kirbpvwh" path="res://Assets/endingstill.png" id="10_ending_still"]
 
 [sub_resource type="Theme" id="Theme"]
 default_font = ExtResource("2")
@@ -47,7 +49,7 @@ content_margin_left = 40.0
 content_margin_top = 40.0
 content_margin_right = 40.0
 content_margin_bottom = 40.0
-bg_color = Color(0.5529412, 0, 0.8235294, 0.8509804)
+bg_color = Color(0.34901962, 0, 0.41960785, 0.8509804)
 
 [node name="DialogueScene" type="Control" unique_id=258328986]
 layout_mode = 3
@@ -69,6 +71,11 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(0.61960787, 1, 1, 1)
 
+[node name="Sprite2D" type="Sprite2D" parent="Background" unique_id=305035734]
+position = Vector2(965, 607)
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("3_ajmj3")
+
 [node name="BioPortrait" type="AnimatedSprite2D" parent="Background" unique_id=95267607]
 unique_name_in_owner = true
 position = Vector2(585, 31)
@@ -83,6 +90,20 @@ position = Vector2(745, 80)
 scale = Vector2(0.6, 0.6)
 texture = ExtResource("7_mascot")
 centered = false
+
+[node name="EndingStill" type="TextureRect" parent="Background" unique_id=2016630757]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("10_ending_still")
+expand_mode = 1
+stretch_mode = 6
 
 [node name="SkipButton" type="TextureButton" parent="." unique_id=521784996]
 unique_name_in_owner = true

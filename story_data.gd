@@ -32,8 +32,8 @@ const BATTLE_STORY_PAGES: Array = [
 
 const ENDING_PAGES: Array[Dictionary] = [
 	{"speaker": "ばいお", "speaker_id": "bio", "text": "魔法少女ぎふとを倒して、魔力をばら撒くお邪魔虫はいなくなったわ！", "characters": [{"id": "bio", "expression": "emphasis"}, {"id": "mascot", "expression": "default"}]},
-	{"speaker": "ウバルン", "speaker_id": "mascot", "text": "これで街の魔力はみんなばいおのものだね！", "characters": [{"id": "bio", "expression": "emphasis"}, {"id": "mascot", "expression": "default"}]},
-	{"speaker": "", "speaker_id": "", "text": "強奪え！ 魔法少女ばいお！\n……次の魔力が生まれるまで、しばらく休もう。", "characters": [{"id": "bio", "expression": "gesture"}, {"id": "mascot", "expression": "default"}]}
+	{"speaker": "ウバルン", "speaker_id": "mascot", "text": "これで街の魔力はみんなばいおのものだね！", "characters": [{"id": "bio", "expression": "emphasis"}, {"id": "mascot", "expression": "default"}], "background_image": "endingstill"},
+	{"speaker": "", "speaker_id": "", "text": "強奪え！ 魔法少女ばいお！\n……次の魔力が生まれるまで、しばらく休もう。", "characters": [{"id": "bio", "expression": "gesture"}, {"id": "mascot", "expression": "default"}], "background_image": "endingstill"}
 ]
 
 const NEXT_SCENES := {
