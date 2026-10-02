@@ -6,6 +6,7 @@ static var requested_dialogue_path: String = ""
 
 const TITLE_DIALOG_BGM: AudioStream = preload("res://Assets/MusMus-BGM-174.mp3")
 const StoryDatabase = preload("res://story_data.gd")
+const DIALOGUE_CHARACTERS_PER_SECOND: float = 40.0
 const INACTIVE_PORTRAIT_COLOR := Color(0.42, 0.42, 0.5, 1.0)
 const ACTIVE_PORTRAIT_COLOR := Color.WHITE
 const CHARACTER_SPEAKER_NAMES := {
@@ -18,6 +19,8 @@ var next_scene: String = ""
 
 var page_index: int = 0
 var finished: bool = false
+var is_revealing_text: bool = false
+var reveal_character_accumulator: float = 0.0
 
 @onready var speaker_label: Label = %Speaker
 @onready var dialogue_label: Label = %Dialogue
@@ -27,6 +30,7 @@ var finished: bool = false
 @onready var ending_still: TextureRect = %EndingStill
 @onready var ending_popup: Control = %EndingPopup
 @onready var title_return_button: TextureButton = %TitleReturnButton
+@onready var audio_settings_ui: AudioSettingsUI = $AudioSettingsUI
 
 var portrait_nodes: Dictionary = {}
 
@@ -59,6 +63,23 @@ func _ready() -> void:
 	_show_page()
 
 
+func _process(delta: float) -> void:
+	if not is_revealing_text or ending_popup.visible:
+		return
+	reveal_character_accumulator += delta * DIALOGUE_CHARACTERS_PER_SECOND
+	var characters_to_reveal: int = floori(reveal_character_accumulator)
+	if characters_to_reveal <= 0:
+		return
+	reveal_character_accumulator -= characters_to_reveal
+	var visible_characters: int = mini(
+		dialogue_label.visible_characters + characters_to_reveal,
+		dialogue_label.get_total_character_count()
+	)
+	dialogue_label.visible_characters = visible_characters
+	if visible_characters >= dialogue_label.get_total_character_count():
+		is_revealing_text = false
+
+
 func _load_dialogue() -> bool:
 	var story_id := "prologue" if dialogue_path.ends_with("prologue.json") else dialogue_path
 	pages = StoryDatabase.get_pages(story_id, GameFlow.story_index)
@@ -73,6 +94,9 @@ func _show_page() -> void:
 	var page := pages[page_index]
 	speaker_label.text = page["speaker"]
 	dialogue_label.text = page["text"]
+	dialogue_label.visible_characters = 0
+	reveal_character_accumulator = 0.0
+	is_revealing_text = dialogue_label.get_total_character_count() > 0
 	ending_still.visible = str(page.get("background_image", "")) == "endingstill"
 	_update_portraits(page)
 
@@ -160,6 +184,10 @@ func _speaker_id_from_name(speaker_name: String) -> String:
 func _advance() -> void:
 	if finished or pages.is_empty():
 		return
+	if is_revealing_text:
+		dialogue_label.visible_characters = -1
+		is_revealing_text = false
+		return
 	if page_index + 1 >= pages.size():
 		_finish()
 	else:
@@ -196,6 +224,8 @@ func _input(event: InputEvent) -> void:
 		return
 	var mouse_event: InputEventMouseButton = event as InputEventMouseButton
 	if mouse_event.button_index != MOUSE_BUTTON_LEFT or not mouse_event.pressed:
+		return
+	if audio_settings_ui.is_pointer_over_controls(mouse_event.position):
 		return
 	var skip_local_position: Vector2 = skip_button.get_global_transform_with_canvas().affine_inverse() * mouse_event.position
 	if Rect2(Vector2.ZERO, skip_button.size).has_point(skip_local_position):

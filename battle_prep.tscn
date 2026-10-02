@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dnq6d043emwe3" path="res://battle_prep.gd" id="1"]
 [ext_resource type="Texture2D" uid="uid://cj57y1xr65dn0" path="res://battleStartButton.png" id="2_dlhmy"]
+[ext_resource type="PackedScene" path="res://audio_settings_ui.tscn" id="2_wjq8q"]
 [ext_resource type="Texture2D" uid="uid://dt47sxemktdes" path="res://Assets/purpleslice.png" id="3_purple_slice"]
 [ext_resource type="Texture2D" uid="uid://1tv1lhwk2dxl" path="res://Assets/closeButton.png" id="4_close"]
 [ext_resource type="Texture2D" uid="uid://cvc5u5bg8h7wp" path="res://Assets/thinking.png" id="5_18wcd"]
@@ -62,8 +63,8 @@ color = Color(0.61960787, 0, 1, 1)
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_top = 75.0
-offset_bottom = 130.0
+offset_top = 37.0
+offset_bottom = 127.0
 grow_horizontal = 2
 theme_override_font_sizes/font_size = 64
 text = "戦闘準備"
@@ -71,15 +72,16 @@ horizontal_alignment = 1
 
 [node name="LoadoutArea" type="HBoxContainer" parent="." unique_id=133748888]
 layout_mode = 0
-offset_left = 569.0
-offset_top = 202.0
-offset_right = 1869.0
-offset_bottom = 822.0
+offset_left = 459.0
+offset_top = 150.0
+offset_right = 1904.0
+offset_bottom = 902.0
 theme_override_constants/separation = 20
 
 [node name="EquippedSkills" type="PanelContainer" parent="LoadoutArea" unique_id=2108933320]
-custom_minimum_size = Vector2(480, 620)
+custom_minimum_size = Vector2(400, 620)
 layout_mode = 2
+size_flags_horizontal = 3
 
 [node name="MarginContainer" type="MarginContainer" parent="LoadoutArea/EquippedSkills" unique_id=1296221167]
 layout_mode = 2
@@ -154,8 +156,9 @@ theme_override_font_sizes/font_size = 24
 select_mode = 1
 
 [node name="AvailableSkills" type="PanelContainer" parent="LoadoutArea" unique_id=1536513364]
-custom_minimum_size = Vector2(390, 620)
+custom_minimum_size = Vector2(400, 620)
 layout_mode = 2
+size_flags_horizontal = 3
 
 [node name="MarginContainer" type="MarginContainer" parent="LoadoutArea/AvailableSkills" unique_id=1517572774]
 layout_mode = 2
@@ -189,8 +192,9 @@ theme_override_font_sizes/font_size = 24
 select_mode = 1
 
 [node name="EnemyInfo" type="PanelContainer" parent="LoadoutArea" unique_id=856644535]
-custom_minimum_size = Vector2(390, 620)
+custom_minimum_size = Vector2(400, 620)
 layout_mode = 2
+size_flags_horizontal = 3
 
 [node name="MarginContainer" type="MarginContainer" parent="LoadoutArea/EnemyInfo" unique_id=461647424]
 layout_mode = 2
@@ -241,10 +245,10 @@ autowrap_mode = 3
 
 [node name="StartButton" type="TextureButton" parent="." unique_id=593353093]
 layout_mode = 0
-offset_left = 1420.0
-offset_top = 870.0
-offset_right = 2317.0
-offset_bottom = 1160.0
+offset_left = 1444.0
+offset_top = 917.0
+offset_right = 2341.0
+offset_bottom = 1207.0
 scale = Vector2(0.5, 0.5)
 texture_normal = ExtResource("2_dlhmy")
 
@@ -297,7 +301,10 @@ texture_normal = ExtResource("4_close")
 ignore_texture_size = true
 stretch_mode = 5
 
+[node name="AudioSettingsUI" parent="." unique_id=1805778089 instance=ExtResource("2_wjq8q")]
+layout_mode = 1
+
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=2011561936]
-position = Vector2(314, 734)
-scale = Vector2(0.7, 0.7)
+position = Vector2(270, 737)
+scale = Vector2(0.6, 0.6)
 texture = ExtResource("5_18wcd")

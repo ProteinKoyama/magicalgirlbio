@@ -1,0 +1,69 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://audio_settings_ui.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://audio_settings_panel.tscn" id="2_panel"]
+[ext_resource type="FontFile" path="res://Assets/AkazukiPOP.otf" id="3_font"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_audio_button"]
+bg_color = Color(0.619608, 0, 1, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.05, 0.02, 0.08, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[node name="AudioSettingsUI" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_script")
+
+[node name="AudioSettingsPanel" parent="." instance=ExtResource("2_panel")]
+visible = false
+
+[node name="AudioToggleButton" type="Button" parent="."]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -90.0
+offset_top = 20.0
+offset_right = -30.0
+offset_bottom = 80.0
+grow_horizontal = 0
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 36
+theme_override_styles/normal = SubResource("StyleBoxFlat_audio_button")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_audio_button")
+theme_override_styles/hover = SubResource("StyleBoxFlat_audio_button")
+text = "♫"
+
+[node name="AudioCloseButton" type="Button" parent="."]
+visible = false
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -90.0
+offset_top = 20.0
+offset_right = -30.0
+offset_bottom = 80.0
+grow_horizontal = 0
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 42
+theme_override_styles/normal = SubResource("StyleBoxFlat_audio_button")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_audio_button")
+theme_override_styles/hover = SubResource("StyleBoxFlat_audio_button")
+text = "×"

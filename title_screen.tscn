@@ -1,28 +1,44 @@
 [gd_scene format=3 uid="uid://bnjy1riq7q62y"]
 
 [ext_resource type="FontFile" uid="uid://baywwgegtnssu" path="res://Assets/AkazukiPOP.otf" id="2_ig5kc"]
+[ext_resource type="Texture2D" uid="uid://bsgbnd484t7re" path="res://Assets/titleImage.png" id="2_xfn3p"]
 [ext_resource type="Script" uid="uid://bwx20nv5xrdpw" path="res://title_screen.gd" id="3_script"]
 [ext_resource type="Texture2D" uid="uid://xnbpaamga0wr" path="res://Assets/01122_1_1.png" id="4_credit_icon"]
 [ext_resource type="Texture2D" uid="uid://c1ilhmqmcxwup" path="res://Assets/start_button_jp.png" id="5_start_button"]
 [ext_resource type="Texture2D" uid="uid://da1e8tns1i5ad" path="res://Assets/credit_button_jp.png" id="6_credit_button"]
 [ext_resource type="Texture2D" uid="uid://b564tjjoeus27" path="res://Assets/logo.png" id="7_jqemp"]
 [ext_resource type="Texture2D" uid="uid://dt47sxemktdes" path="res://Assets/purpleslice.png" id="8_purple_slice"]
-[ext_resource type="Texture2D" uid="uid://dhxf0qt6slaef" path="res://Assets/volume_bar.png" id="9_volume_bar"]
-[ext_resource type="Texture2D" uid="uid://bttksmxe1nsyd" path="res://Assets/volume_knob.png" id="10_volume_knob"]
 [ext_resource type="Texture2D" uid="uid://b8r3wppkc7grl" path="res://Assets/IMG_3886.png" id="10_xfn3p"]
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_f175k"]
-texture = ExtResource("9_volume_bar")
-texture_margin_top = 10.0
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_bmb4v"]
-texture = ExtResource("9_volume_bar")
-texture_margin_top = 10.0
+[ext_resource type="PackedScene" path="res://audio_settings_ui.tscn" id="11_audio_settings_ui"]
 
 [sub_resource type="Theme" id="Theme_credits"]
 default_font = ExtResource("2_ig5kc")
 default_font_size = 28
 Label/colors/font_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_story_mode"]
+bg_color = Color(0.619608, 0, 1, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.05, 0.02, 0.08, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_story_mode_hover"]
+bg_color = Color(0.72, 0.2, 1, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.05, 0.02, 0.08, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
 
 [node name="TitleScene" type="Control" unique_id=832864324]
 layout_mode = 3
@@ -43,10 +59,16 @@ color = Color(0.012617188, 0.012617188, 0.012617188, 1)
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=219307328]
 
-[node name="ColorRect" type="ColorRect" parent="CanvasLayer" unique_id=1677027221]
-offset_right = 1920.0
-offset_bottom = 1080.0
-color = Color(0.5176471, 0.8509804, 1, 1)
+[node name="TitleBackground" type="TextureRect" parent="CanvasLayer" unique_id=2013767604]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_xfn3p")
+expand_mode = 1
+stretch_mode = 6
 
 [node name="StartButton" type="TextureButton" parent="CanvasLayer" unique_id=1816301203]
 unique_name_in_owner = true
@@ -85,103 +107,30 @@ texture_hover = ExtResource("6_credit_button")
 ignore_texture_size = true
 stretch_mode = 0
 
-[node name="SoundPanel" type="NinePatchRect" parent="CanvasLayer" unique_id=496273427]
+[node name="StoryModeButton" type="Button" parent="CanvasLayer" unique_id=1395221137]
+unique_name_in_owner = true
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -603.0
-offset_top = 60.0
-offset_right = -61.0
-offset_bottom = 263.0
+offset_left = -360.0
+offset_top = 20.0
+offset_right = -110.0
+offset_bottom = 80.0
 grow_horizontal = 0
-texture = ExtResource("8_purple_slice")
-patch_margin_left = 80
-patch_margin_top = 80
-patch_margin_right = 80
-patch_margin_bottom = 80
+theme_override_fonts/font = ExtResource("2_ig5kc")
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("StyleBoxFlat_story_mode")
+theme_override_styles/hover = SubResource("StyleBoxFlat_story_mode_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_story_mode")
+text = "ストーリー：ON"
 
-[node name="Margin" type="MarginContainer" parent="CanvasLayer/SoundPanel" unique_id=2082675501]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 85.0
-offset_top = 65.0
-offset_right = -85.0
-offset_bottom = -65.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="Rows" type="VBoxContainer" parent="CanvasLayer/SoundPanel/Margin" unique_id=579683437]
-layout_mode = 2
-theme_override_constants/separation = 14
-
-[node name="BgmRow" type="HBoxContainer" parent="CanvasLayer/SoundPanel/Margin/Rows" unique_id=404096872]
-layout_mode = 2
-theme_override_constants/separation = 12
-alignment = 2
-
-[node name="Label" type="Label" parent="CanvasLayer/SoundPanel/Margin/Rows/BgmRow" unique_id=764053384]
-custom_minimum_size = Vector2(62, 0)
-layout_mode = 2
-size_flags_horizontal = 0
-theme_override_font_sizes/font_size = 32
-text = "BGM"
-
-[node name="BgmSlider" type="HSlider" parent="CanvasLayer/SoundPanel/Margin/Rows/BgmRow" unique_id=1765646385]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(220, 28)
-layout_mode = 2
-size_flags_horizontal = 0
-mouse_default_cursor_shape = 2
-theme_override_icons/grabber = ExtResource("10_volume_knob")
-theme_override_icons/grabber_highlight = ExtResource("10_volume_knob")
-theme_override_styles/slider = SubResource("StyleBoxTexture_f175k")
-value = 20.0
-
-[node name="BgmValue" type="Label" parent="CanvasLayer/SoundPanel/Margin/Rows/BgmRow" unique_id=754616129]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(120, 0)
-layout_mode = 2
-size_flags_horizontal = 0
-theme_override_font_sizes/font_size = 30
-text = "20%"
-horizontal_alignment = 2
-
-[node name="SeRow" type="HBoxContainer" parent="CanvasLayer/SoundPanel/Margin/Rows" unique_id=411198949]
-layout_mode = 2
-theme_override_constants/separation = 12
-alignment = 2
-
-[node name="Label" type="Label" parent="CanvasLayer/SoundPanel/Margin/Rows/SeRow" unique_id=569060825]
-custom_minimum_size = Vector2(62, 0)
-layout_mode = 2
-size_flags_horizontal = 0
-theme_override_font_sizes/font_size = 32
-text = "SE"
-
-[node name="SeSlider" type="HSlider" parent="CanvasLayer/SoundPanel/Margin/Rows/SeRow" unique_id=1688709666]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(220, 28)
-layout_mode = 2
-size_flags_horizontal = 0
-mouse_default_cursor_shape = 2
-theme_override_icons/grabber = ExtResource("10_volume_knob")
-theme_override_icons/grabber_highlight = ExtResource("10_volume_knob")
-theme_override_styles/slider = SubResource("StyleBoxTexture_bmb4v")
-value = 50.0
-
-[node name="SeValue" type="Label" parent="CanvasLayer/SoundPanel/Margin/Rows/SeRow" unique_id=1649788448]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(120, 0)
-layout_mode = 2
-size_flags_horizontal = 0
-theme_override_font_sizes/font_size = 30
-text = "50%"
-horizontal_alignment = 2
+[node name="AudioSettingsUI" parent="CanvasLayer" unique_id=870457157 instance=ExtResource("11_audio_settings_ui")]
 
 [node name="Logo" type="Sprite2D" parent="CanvasLayer" unique_id=1804141898]
-position = Vector2(677, 204)
+position = Vector2(641, 167.00002)
 scale = Vector2(0.51309377, 0.44272244)
 texture = ExtResource("7_jqemp")
 

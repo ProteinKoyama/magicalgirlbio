@@ -20,6 +20,7 @@
 [ext_resource type="Script" uid="uid://bg4tcvfcyoya2" path="res://battle_special_effect.gd" id="16_special_effect"]
 [ext_resource type="Texture2D" uid="uid://o730gicryknf" path="res://Assets/barrier_mirror.svg" id="17_barrier_icon"]
 [ext_resource type="AudioStream" uid="uid://ysrawwufh3ex" path="res://Assets/orbup.mp3" id="18_orbup_se"]
+[ext_resource type="PackedScene" path="res://audio_settings_ui.tscn" id="19_audio_settings_ui"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_7g1a8"]
 animations = [{
@@ -51,9 +52,8 @@ animations = [{
 [sub_resource type="LabelSettings" id="LabelSettings_p22n3"]
 font = ExtResource("5_lcjiy")
 font_size = 52
-font_color = Color(1, 1, 1, 1)
-outline_color = Color(0, 0, 0, 1)
 outline_size = 5
+outline_color = Color(0, 0, 0, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hp_fill"]
 bg_color = Color(0.117647, 0.8, 0.25098, 1)
@@ -144,7 +144,7 @@ bus = &"SE"
 stream = ExtResource("15_mahou_se")
 bus = &"SE"
 
-[node name="OrbUpSePlayer" type="AudioStreamPlayer" parent="."]
+[node name="OrbUpSePlayer" type="AudioStreamPlayer" parent="." unique_id=1548158933]
 stream = ExtResource("18_orbup_se")
 bus = &"SE"
 
@@ -158,6 +158,18 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("16_special_effect")
+
+[node name="EnemySpecialEffect" type="Control" parent="."]
+z_index = 50
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("16_special_effect")
+effect_color = Color(1, 1, 1, 1)
 
 [node name="ColorRect" type="ColorRect" parent="." unique_id=2052995328]
 layout_mode = 0
@@ -216,7 +228,7 @@ theme_override_constants/separation = 8
 alignment = 1
 
 [node name="Name" type="Label" parent="Player/NameRow" unique_id=101198678]
-custom_minimum_size = Vector2(300, 44)
+custom_minimum_size = Vector2(280, 44)
 layout_mode = 2
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 5
@@ -224,6 +236,16 @@ theme_override_font_sizes/font_size = 28
 text = "ばいお"
 label_settings = SubResource("LabelSettings_p22n3")
 horizontal_alignment = 1
+
+[node name="PoisonIcon" type="TextureRect" parent="Player/NameRow" unique_id=958974414]
+visible = false
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+tooltip_text = "猛毒"
+mouse_filter = 2
+texture = ExtResource("11_poison_skull")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="BarrierIcon" type="TextureRect" parent="Player/NameRow" unique_id=1200662224]
 visible = false
@@ -825,3 +847,6 @@ mouse_default_cursor_shape = 2
 texture_normal = ExtResource("7_retry")
 ignore_texture_size = true
 stretch_mode = 5
+
+[node name="AudioSettingsUI" parent="." unique_id=2088612829 instance=ExtResource("19_audio_settings_ui")]
+layout_mode = 1

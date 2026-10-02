@@ -5,10 +5,8 @@ const TITLE_DIALOG_BGM: AudioStream = preload("res://Assets/MusMus-BGM-174.mp3")
 
 @onready var start_button: BaseButton = %StartButton
 @onready var credits_button: BaseButton = $CanvasLayer/CreditsButton
-@onready var bgm_slider: HSlider = %BgmSlider
-@onready var se_slider: HSlider = %SeSlider
-@onready var bgm_value: Label = %BgmValue
-@onready var se_value: Label = %SeValue
+@onready var audio_settings_ui: AudioSettingsUI = $CanvasLayer/AudioSettingsUI
+@onready var story_mode_button: Button = %StoryModeButton
 @onready var credits_overlay: Control = %CreditsOverlay
 @onready var credits_close_button: Button = %CreditsCloseButton
 @onready var mit_license_text: Label = $CanvasLayer/CreditsOverlay/Center/Window/Padding/Content/EngineLicensesScroll/EngineLicenses/MitLicenseText
@@ -19,32 +17,41 @@ var engine_license_content_loaded: bool = false
 
 func _ready() -> void:
 	BgmManager.play_bgm(TITLE_DIALOG_BGM)
-	bgm_slider.set_value_no_signal(BgmManager.get_bus_volume_percent(&"BGM"))
-	se_slider.set_value_no_signal(BgmManager.get_bus_volume_percent(&"SE"))
 	start_button.pressed.connect(_start_prologue)
 	credits_button.pressed.connect(_open_credits)
+	story_mode_button.pressed.connect(_toggle_story_mode)
 	credits_close_button.pressed.connect(_close_credits)
+	_update_story_mode_button()
 	for button: BaseButton in [start_button, credits_button]:
 		button.self_modulate = Color.WHITE
 		button.mouse_entered.connect(_on_button_mouse_entered.bind(button))
 		button.mouse_exited.connect(_on_button_mouse_exited.bind(button))
-	bgm_slider.value_changed.connect(_on_bgm_changed)
-	se_slider.value_changed.connect(_on_se_changed)
-	_on_bgm_changed(bgm_slider.value)
-	_on_se_changed(se_slider.value)
 
 
 func _start_prologue() -> void:
 	GameFlow.reset_run()
-	DialogueScene.play(get_tree(), "prologue")
+	if GameFlow.story_enabled:
+		DialogueScene.play(get_tree(), "prologue")
+	else:
+		SceneTransition.change_scene_to_file("res://battle_prep.tscn")
+
+
+func _toggle_story_mode() -> void:
+	GameFlow.story_enabled = not GameFlow.story_enabled
+	_update_story_mode_button()
+
+
+func _update_story_mode_button() -> void:
+	story_mode_button.text = "ストーリー：ON" if GameFlow.story_enabled else "ストーリー：OFF"
 
 
 func _open_credits() -> void:
 	if not engine_license_content_loaded:
 		_populate_engine_license_content()
 	credits_overlay.show()
-	for control: Control in [start_button, credits_button, bgm_slider, se_slider]:
+	for control: Control in [start_button, credits_button, story_mode_button]:
 		control.focus_mode = Control.FOCUS_NONE
+	audio_settings_ui.set_interaction_enabled(false)
 	credits_close_button.grab_focus()
 
 
@@ -82,8 +89,9 @@ func _format_copyright_info(components: Array[Dictionary]) -> String:
 
 func _close_credits() -> void:
 	credits_overlay.hide()
-	for control: Control in [start_button, credits_button, bgm_slider, se_slider]:
+	for control: Control in [start_button, credits_button, story_mode_button]:
 		control.focus_mode = Control.FOCUS_ALL
+	audio_settings_ui.set_interaction_enabled(true)
 	credits_button.grab_focus()
 
 
@@ -93,17 +101,3 @@ func _on_button_mouse_entered(button: BaseButton) -> void:
 
 func _on_button_mouse_exited(button: BaseButton) -> void:
 	button.self_modulate = Color.WHITE
-
-
-func _on_bgm_changed(value: float) -> void:
-	bgm_value.text = "%d%%" % roundi(value)
-	_set_bus_volume("BGM", value)
-
-
-func _on_se_changed(value: float) -> void:
-	se_value.text = "%d%%" % roundi(value)
-	_set_bus_volume("SE", value)
-
-
-func _set_bus_volume(bus_name: StringName, value: float) -> void:
-	BgmManager.set_bus_volume_percent(bus_name, value)

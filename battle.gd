@@ -16,7 +16,7 @@ const MAX_CHARGE := 10
 const PLAYER_ATTACK_DAMAGE := 5
 const PLAYER_SKILL_DAMAGE := 5
 const PLAYER_SPECIAL_DAMAGE := 40
-const VAMPIRE_DAMAGE := 5
+const VAMPIRE_DAMAGE := 10
 const VAMPIRE_CHARGE_GAIN := 1
 const BASE_CHARGE_GAIN := 2
 const ENEMY_PORTRAIT_WIDTH := 600.0
@@ -33,6 +33,8 @@ const DAMAGE_RECOIL_DISTANCE := 10.0
 const DAMAGE_RECOIL_FRAME_DURATION := 1.0 / 60.0
 const HP_DAMAGE_COLOR := Color(1.0, 0.12, 0.12)
 const HP_RECOVERY_COLOR := Color(0.1, 1.0, 0.2)
+const GIFT_DAMAGE_TEXTURE: Texture2D = preload("res://Assets/gift_damage.png")
+const GIFT_ATTACK_TEXTURE: Texture2D = preload("res://Assets/gift_attack.png")
 
 @onready var title: Label = $Title
 @onready var round_info: Label = $RoundInfo
@@ -47,6 +49,7 @@ const HP_RECOVERY_COLOR := Color(0.1, 1.0, 0.2)
 @onready var enemy_poison_icon: TextureRect = $Enemy/NameRow/StatusIcons/PoisonIcon
 @onready var enemy_barrier_icon: TextureRect = $Enemy/NameRow/StatusIcons/BarrierIcon
 @onready var enemy_portrait: TextureRect = $Enemy/Portrait
+@onready var player_poison_icon: TextureRect = $Player/NameRow/PoisonIcon
 @onready var enemy_hp_text: Label = $Enemy/HPText
 @onready var enemy_hp_bar: ProgressBar = $Enemy/HP
 @onready var enemy_charge_text: Label = $Enemy/ChargeText
@@ -82,6 +85,7 @@ const HP_RECOVERY_COLOR := Color(0.1, 1.0, 0.2)
 @onready var mahou_se_player: AudioStreamPlayer = $MahouSePlayer
 @onready var orbup_se_player: AudioStreamPlayer = $OrbUpSePlayer
 @onready var player_special_effect: BattleSpecialEffect = $PlayerSpecialEffect
+@onready var enemy_special_effect: BattleSpecialEffect = $EnemySpecialEffect
 
 var player_max_hp := 50
 var player_hp := 50
@@ -100,10 +104,14 @@ var energy_types: Array[String] = []
 var battle_finished := false
 var battle_data: Dictionary = {}
 var enemy_is_poisoned := false
+var player_is_poisoned := false
 var enemy_barrier_active := false
 var player_barrier_active := false
-var poison_elapsed_turns := 0
+var enemy_poison_elapsed_turns := 0
+var player_poison_elapsed_turns := 0
 var player_animation_version := 0
+var enemy_portrait_image_version := 0
+var enemy_default_texture: Texture2D
 var hp_change_queue: Array[Dictionary] = []
 var hp_change_queue_active := false
 var damage_recoil_home_positions: Dictionary = {}
@@ -121,7 +129,7 @@ func _ready() -> void:
 	player_detail_popup.max_size = PLAYER_DETAIL_POPUP_SIZE
 	player_detail_popup.size = PLAYER_DETAIL_POPUP_SIZE
 	randomize()
-	var data := GameFlow.current_battle()
+	var data: Dictionary = GameFlow.current_battle()
 	battle_data = data
 	player_max_hp = int(data["player_hp"])
 	player_hp = player_max_hp
@@ -133,6 +141,7 @@ func _ready() -> void:
 	var enemy_texture: Variant = data.get("portrait")
 	if enemy_texture is Texture2D:
 		var portrait_texture: Texture2D = enemy_texture as Texture2D
+		enemy_default_texture = portrait_texture
 		enemy_portrait.texture = portrait_texture
 		var texture_size: Vector2 = portrait_texture.get_size()
 		if texture_size.x > 0.0:
@@ -242,6 +251,11 @@ func _choose_enemy_energy() -> int:
 		if _is_energy_available(i):
 			available.append(i)
 	var priority: Array = battle_data.get("priority", [ENERGY_ATTACK, ENERGY_SKILL, ENERGY_CHARGE])
+	var enemy_skill_id: String = str(battle_data.get("skill_id", ""))
+	if enemy_skill_id == "vampire" and enemy_hp * 2 < enemy_max_hp:
+		priority = [ENERGY_CHARGE, ENERGY_SKILL, ENERGY_ATTACK]
+	elif enemy_skill_id == "barrier" and enemy_barrier_active:
+		priority = [ENERGY_CHARGE, ENERGY_SKILL, ENERGY_ATTACK]
 	for preferred_type in priority:
 		for index in available:
 			if energy_types[index] == preferred_type:
@@ -335,8 +349,10 @@ func _apply_energy(actor: String, energy_type: String) -> void:
 	else:
 		match energy_type:
 			ENERGY_ATTACK:
+				_play_enemy_attack_image()
 				var damage: int = int(battle_data.get("attack", 2))
 				_change_player_hp(-damage)
+				_apply_enemy_attack_trait()
 			ENERGY_SKILL:
 				_apply_enemy_skill()
 			ENERGY_CHARGE:
@@ -344,7 +360,7 @@ func _apply_energy(actor: String, energy_type: String) -> void:
 				enemy_charge += charge_gain
 		if enemy_charge >= enemy_charge_max and player_hp > 0:
 			enemy_charge -= enemy_charge_max
-			_apply_enemy_special()
+			await _apply_enemy_special()
 
 func _apply_enemy_skill() -> void:
 	match str(battle_data.get("skill_id", "")):
@@ -362,6 +378,16 @@ func _apply_enemy_skill() -> void:
 				enemy_barrier_active = true
 				enemy_barrier_icon.show()
 
+func _apply_enemy_attack_trait() -> void:
+	match str(battle_data.get("skill_id", "")):
+		"vampire":
+			_apply_poison_to_player()
+		"barrier":
+			if enemy_barrier_active:
+				enemy_charge += 1
+		"present":
+			_change_enemy_hp(2)
+
 func _apply_enemy_special() -> void:
 	match str(battle_data.get("special_id", "")):
 		"body_slam":
@@ -369,8 +395,13 @@ func _apply_enemy_special() -> void:
 		"regeneration":
 			_change_enemy_hp(enemy_max_hp - enemy_hp)
 		"death_gift":
+			if str(battle_data.get("name", "")) == "魔法少女ぎふと":
+				mahou_se_player.play()
+				await enemy_special_effect.play_effect(_get_actor_portrait_rect("player").get_center())
+			_play_enemy_attack_image()
 			_change_player_hp(-50)
 		"angel_arrow":
+			_play_enemy_attack_image()
 			_change_player_hp(-30)
 			_change_enemy_hp(10)
 
@@ -414,15 +445,25 @@ func _apply_poison_to_enemy() -> void:
 	if enemy_is_poisoned:
 		return
 	enemy_is_poisoned = true
-	poison_elapsed_turns = 0
+	enemy_poison_elapsed_turns = 0
 	enemy_poison_icon.show()
 
-func _apply_poison_at_round_end() -> void:
-	if not enemy_is_poisoned or enemy_hp <= 0:
+func _apply_poison_to_player() -> void:
+	if player_is_poisoned:
 		return
-	var poison_damage := 2 + poison_elapsed_turns
-	_change_enemy_hp(-poison_damage, false)
-	poison_elapsed_turns += 1
+	player_is_poisoned = true
+	player_poison_elapsed_turns = 0
+	player_poison_icon.show()
+
+func _apply_poison_at_round_end() -> void:
+	if enemy_is_poisoned and enemy_hp > 0:
+		var enemy_poison_damage := 2 + enemy_poison_elapsed_turns
+		_change_enemy_hp(-enemy_poison_damage, false)
+		enemy_poison_elapsed_turns += 1
+	if player_is_poisoned and player_hp > 0:
+		var player_poison_damage := 2 + player_poison_elapsed_turns
+		_change_player_hp(-player_poison_damage)
+		player_poison_elapsed_turns += 1
 
 func _change_player_hp(amount: int) -> int:
 	if amount < 0 and player_barrier_active:
@@ -452,10 +493,31 @@ func _change_enemy_hp(amount: int, play_attack_se: bool = true) -> int:
 	if actual_change != 0:
 		if actual_change < 0:
 			_play_damage_recoil("enemy")
+			_play_enemy_damage_image()
 		if actual_change < 0 and play_attack_se:
 			attack_se_player.play()
 		_show_hp_change("enemy", actual_change, actual_change > 0)
 	return actual_change
+
+func _play_enemy_damage_image() -> void:
+	if str(battle_data.get("name", "")) != "魔法少女ぎふと":
+		return
+	enemy_portrait_image_version += 1
+	var image_version: int = enemy_portrait_image_version
+	enemy_portrait.texture = GIFT_DAMAGE_TEXTURE
+	await get_tree().create_timer(0.75).timeout
+	if image_version == enemy_portrait_image_version and not battle_finished:
+		enemy_portrait.texture = enemy_default_texture
+
+func _play_enemy_attack_image() -> void:
+	if str(battle_data.get("name", "")) != "魔法少女ぎふと":
+		return
+	enemy_portrait_image_version += 1
+	var image_version: int = enemy_portrait_image_version
+	enemy_portrait.texture = GIFT_ATTACK_TEXTURE
+	await get_tree().create_timer(0.65).timeout
+	if image_version == enemy_portrait_image_version and not battle_finished:
+		enemy_portrait.texture = enemy_default_texture
 
 func _play_damage_recoil(actor: String) -> void:
 	var portrait: CanvasItem = player_portrait if actor == "player" else enemy_portrait
@@ -570,7 +632,7 @@ func _play_player_animation(animation_name: StringName, duration: float = 0.0) -
 	if animation_name == &"default" or duration <= 0.0:
 		return
 	await get_tree().create_timer(duration).timeout
-	if animation_version == player_animation_version and not battle_finished:
+	if animation_version == player_animation_version and not battle_finished and player_hp > 0:
 		_play_player_animation(&"default")
 
 func _check_battle_end() -> bool:
@@ -669,8 +731,9 @@ func _show_enemy_detail() -> void:
 	var skill_name: String = str(actions[0]) if actions.size() > 0 else "未登録"
 	var special_name: String = str(actions[1]) if actions.size() > 1 else "未登録"
 	enemy_detail_name.text = str(battle_data.get("name", "敵"))
-	enemy_detail_description.text = "攻撃力：%dダメージ\n\nスキル「%s」\n%s\n\n必殺技「%s」\n%s" % [
+	enemy_detail_description.text = "攻撃力：%dダメージ\n攻撃特性：%s\n\nスキル「%s」\n%s\n\n必殺技「%s」\n%s" % [
 		int(battle_data.get("attack", 0)),
+		str(battle_data.get("attack_trait", "なし")),
 		skill_name,
 		str(battle_data.get("skill_description", "性能は登録されていません。")),
 		special_name,

@@ -1,0 +1,112 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://audio_settings_panel.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://dhxf0qt6slaef" path="res://Assets/volume_bar.png" id="2_volume_bar"]
+[ext_resource type="Texture2D" uid="uid://bttksmxe1nsyd" path="res://Assets/volume_knob.png" id="3_volume_knob"]
+[ext_resource type="Texture2D" uid="uid://dt47sxemktdes" path="res://Assets/purpleslice.png" id="4_purple_slice"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_bgm_track"]
+texture = ExtResource("2_volume_bar")
+expand_margin_top = 8.0
+expand_margin_bottom = 8.0
+texture_margin_top = 10.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_se_track"]
+texture = ExtResource("2_volume_bar")
+expand_margin_top = 8.0
+expand_margin_bottom = 8.0
+texture_margin_top = 10.0
+
+[node name="AudioSettingsPanel" type="NinePatchRect"]
+unique_name_in_owner = true
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -585.0
+offset_top = 37.0
+offset_right = 121.0
+offset_bottom = 240.0
+grow_horizontal = 0
+scale = Vector2(0.8, 0.8)
+texture = ExtResource("4_purple_slice")
+patch_margin_left = 80
+patch_margin_top = 80
+patch_margin_right = 80
+patch_margin_bottom = 80
+script = ExtResource("1_script")
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 85.0
+offset_top = 65.0
+offset_right = -85.0
+offset_bottom = -65.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Rows" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="BgmRow" type="HBoxContainer" parent="Margin/Rows"]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 2
+
+[node name="Label" type="Label" parent="Margin/Rows/BgmRow"]
+custom_minimum_size = Vector2(62, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 32
+text = "BGM"
+
+[node name="BgmSlider" type="HSlider" parent="Margin/Rows/BgmRow"]
+custom_minimum_size = Vector2(330, 42)
+layout_mode = 2
+size_flags_horizontal = 0
+mouse_default_cursor_shape = 2
+theme_override_icons/grabber = ExtResource("3_volume_knob")
+theme_override_icons/grabber_highlight = ExtResource("3_volume_knob")
+theme_override_styles/slider = SubResource("StyleBoxTexture_bgm_track")
+value = 20.0
+
+[node name="BgmValue" type="Label" parent="Margin/Rows/BgmRow"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 30
+text = "20%"
+horizontal_alignment = 2
+
+[node name="SeRow" type="HBoxContainer" parent="Margin/Rows"]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 2
+
+[node name="Label" type="Label" parent="Margin/Rows/SeRow"]
+custom_minimum_size = Vector2(62, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 32
+text = "SE"
+
+[node name="SeSlider" type="HSlider" parent="Margin/Rows/SeRow"]
+custom_minimum_size = Vector2(330, 42)
+layout_mode = 2
+size_flags_horizontal = 0
+mouse_default_cursor_shape = 2
+theme_override_icons/grabber = ExtResource("3_volume_knob")
+theme_override_icons/grabber_highlight = ExtResource("3_volume_knob")
+theme_override_styles/slider = SubResource("StyleBoxTexture_se_track")
+value = 50.0
+
+[node name="SeValue" type="Label" parent="Margin/Rows/SeRow"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_font_sizes/font_size = 30
+text = "50%"
+horizontal_alignment = 2

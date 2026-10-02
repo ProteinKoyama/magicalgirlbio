@@ -9,6 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://du7t6rpxwer8b" path="res://Assets/09254.png" id="6_gesture"]
 [ext_resource type="Texture2D" uid="uid://ds3cl01day8v2" path="res://Assets/mascot.png" id="7_mascot"]
 [ext_resource type="Texture2D" uid="uid://dt47sxemktdes" path="res://Assets/purpleslice.png" id="8_purple_slice"]
+[ext_resource type="PackedScene" path="res://audio_settings_ui.tscn" id="9_mblti"]
 [ext_resource type="Texture2D" uid="uid://b4sfcpepckjav" path="res://Assets/titleReturnButton.png" id="9_title_return"]
 [ext_resource type="Texture2D" uid="uid://dqvm1kirbpvwh" path="res://Assets/endingstill.png" id="10_ending_still"]
 
@@ -105,17 +106,13 @@ texture = ExtResource("10_ending_still")
 expand_mode = 1
 stretch_mode = 6
 
+[node name="AudioSettingsUI" parent="." instance=ExtResource("9_mblti")]
+
 [node name="SkipButton" type="TextureButton" parent="." unique_id=521784996]
 unique_name_in_owner = true
 layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -437.0
-offset_top = 27.000002
-offset_right = 460.0
-offset_bottom = 317.0
-grow_horizontal = 0
+offset_right = 897.0
+offset_bottom = 290.0
 scale = Vector2(0.4, 0.4)
 texture_normal = ExtResource("3_758ep")
 

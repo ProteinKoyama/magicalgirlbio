@@ -17,23 +17,27 @@ const PROLOGUE_PAGES: Array[Dictionary] = [
 const BATTLE_STORY_PAGES: Array = [
 	[
 		{"speaker": "", "speaker_id": "", "text": "スライムの魔力を奪った。\n微々たるものだが無いよりはマシだろう。", "characters": [{"id": "bio", "expression": "default"}, {"id": "mascot", "expression": "default"}]},
-		{"speaker": "ばいお", "speaker_id": "bio", "text": "次はもっと大きな獲物よ。\n他の魔法少女に勝つために魔力を集めるわ！", "characters": [{"id": "bio", "expression": "emphasis"}, {"id": "mascot", "expression": "default"}]}
+		{"speaker": "ウバルン", "speaker_id": "mascot", "text": "ばいおは倒した敵の能力を奪うことができるんだね！", "characters": [{"id": "bio", "expression": "default"}, {"id": "mascot", "expression": "default"}]},
+		{"speaker": "ばいお", "speaker_id": "bio", "text": "次はもっと大きな獲物よ！\n他の魔法少女に勝つために魔力を集めるわ！", "characters": [{"id": "bio", "expression": "emphasis"}, {"id": "mascot", "expression": "default"}]}
 	],
 	[
 		{"speaker": "ばいお", "speaker_id": "bio", "text": "なんか力を蓄えてた不審者を倒したわ！", "characters": [{"id": "bio", "expression": "emphasis"}, {"id": "mascot", "expression": "default"}]},
-		{"speaker": "", "speaker_id": "", "text": "魔法少女ぎふとの使い魔、えんじぇるんが力を蓄えているという。\nばいおは次の獲物を見つけた。", "characters": [{"id": "bio", "expression": "emphasis"}, {"id": "mascot", "expression": "default"}]}
+		{"speaker": "", "speaker_id": "", "text": "ばいおは次の獲物を見つけた。\n魔法少女ぎふとの使い魔、えんじぇるんが力を蓄えているという。", "characters": [{"id": "bio", "expression": "emphasis"}, {"id": "mascot", "expression": "default"}]},
+		{"speaker": "ばいお", "speaker_id": "bio", "text": "ぎふとの力を削ぐためにも、邪魔な害獣をとっちめるわよ！", "characters": [{"id": "bio", "expression": "emphasis"}, {"id": "mascot", "expression": "default"}]},
 	],
 	[
 		{"speaker": "ウバルン", "speaker_id": "mascot", "text": "魔法少女ぎふとを守っていたえんじぇるんを倒したね！", "characters": [{"id": "bio", "expression": "default"}, {"id": "mascot", "expression": "default"}]},
-		{"speaker": "ばいお", "speaker_id": "bio", "text": "十分な魔力が集まったわ！\n次はいよいよ魔法少女ぎふとね！", "characters": [{"id": "bio", "expression": "emphasis"}, {"id": "mascot", "expression": "default"}]},
+		{"speaker": "ばいお", "speaker_id": "bio", "text": "ハァハァ……あの害獣やたらしぶとくて苦労したわ！", "characters": [{"id": "bio", "expression": "emphasis"}, {"id": "mascot", "expression": "default"}]},
+		{"speaker": "ばいお", "speaker_id": "bio", "text": "でも、十分な魔力が集まったわ！\n次はいよいよ魔法少女ぎふとね！", "characters": [{"id": "bio", "expression": "emphasis"}, {"id": "mascot", "expression": "default"}]},
 		{"speaker": "", "speaker_id": "", "text": "更なる力を得たばいお。\n宿敵、魔法少女ぎふととの決戦が迫る。", "characters": [{"id": "bio", "expression": "emphasis"}, {"id": "mascot", "expression": "default"}]}
 	]
 ]
 
 const ENDING_PAGES: Array[Dictionary] = [
-	{"speaker": "ばいお", "speaker_id": "bio", "text": "魔法少女ぎふとを倒して、魔力をばら撒くお邪魔虫はいなくなったわ！", "characters": [{"id": "bio", "expression": "emphasis"}, {"id": "mascot", "expression": "default"}]},
+	{"speaker": "ばいお", "speaker_id": "bio", "text": "魔法少女ぎふとを倒して、魔力をばら撒くお邪魔虫はいなくなったわ！", "characters": [{"id": "bio", "expression": "emphasis"}, {"id": "mascot", "expression": "default"}], "background_image": "endingstill"},
 	{"speaker": "ウバルン", "speaker_id": "mascot", "text": "これで街の魔力はみんなばいおのものだね！", "characters": [{"id": "bio", "expression": "emphasis"}, {"id": "mascot", "expression": "default"}], "background_image": "endingstill"},
-	{"speaker": "", "speaker_id": "", "text": "強奪え！ 魔法少女ばいお！\n……次の魔力が生まれるまで、しばらく休もう。", "characters": [{"id": "bio", "expression": "gesture"}, {"id": "mascot", "expression": "default"}], "background_image": "endingstill"}
+	{"speaker": "ばいお", "speaker_id": "bio", "text": "さあ、次の魔力を探しに行くわよ！", "characters": [{"id": "bio", "expression": "emphasis"}, {"id": "mascot", "expression": "default"}], "background_image": "endingstill"},
+	{"speaker": "", "speaker_id": "", "text": "彼女の欲は留まることを知らない！強奪え！ 魔法少女ばいお！", "characters": [{"id": "bio", "expression": "gesture"}, {"id": "mascot", "expression": "default"}], "background_image": "endingstill"}
 ]
 
 const NEXT_SCENES := {

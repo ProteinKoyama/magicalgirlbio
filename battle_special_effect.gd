@@ -8,6 +8,8 @@ const PULSE_FRAMES := 60
 const LINE_COUNT := 24
 const LINE_OUTER_RADIUS := 230.0
 
+@export var effect_color: Color = Color.BLACK
+
 var effect_center := Vector2.ZERO
 var circle_diameter := 0.0
 var gather_progress := 0.0
@@ -47,7 +49,7 @@ func play_effect(global_center: Vector2) -> void:
 func _draw() -> void:
 	if draw_gather_lines:
 		_draw_gathering_lines()
-	draw_circle(effect_center, circle_diameter * 0.5, Color.BLACK)
+	draw_circle(effect_center, circle_diameter * 0.5, effect_color)
 
 
 func _draw_gathering_lines() -> void:
@@ -63,7 +65,7 @@ func _draw_gathering_lines() -> void:
 		draw_line(
 			effect_center + direction * start_radius,
 			effect_center + direction * end_radius,
-			Color.BLACK,
+		effect_color,
 			line_width,
 			true
 		)

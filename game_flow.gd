@@ -8,6 +8,7 @@ const GIFT_TEXTURE: Texture2D = preload("res://Assets/gift_common.png")
 
 var battle_index := 0
 var story_index := 0
+var story_enabled: bool = true
 var total_rounds := 0
 var best_rounds_by_battle: Dictionary = {}
 var selected_skill := "強奪"
@@ -37,15 +38,15 @@ const SKILL_DESCRIPTIONS := {
 	"猛毒": "敵を猛毒状態にし、ラウンド終了時に2＋経過ターン数のダメージを与える。すでに猛毒の場合は重複しない",
 	"スキルチャージ": "自分の必殺チャージを2増加する",
 	"魔力吸収": "敵の必殺チャージを2減らし、自分の必殺チャージを1増加する",
-	"吸血": "相手に5ダメージを与え、自分の必殺チャージを1増やす",
+	"吸血": "相手に10ダメージを与え、自分の必殺チャージを1増やす",
 	"バリア": "次に受ける1回分のダメージを無効化する。毒ダメージも防ぐ。有効中は重ねがけできない"
 }
 
 const BATTLES := [
 	{"name": "スライム", "hp": 20, "player_hp": 50, "portrait": SLIME_TEXTURE, "description": "魔力吸収：相手の必殺チャージを2減らし、自分の必殺チャージを1増やす。\n体当たり：相手に10ダメージ。", "actions": ["魔力吸収", "体当たり"], "skill_description": "相手の必殺チャージを2減らし、自分の必殺チャージを1増やす", "special_description": "相手に10ダメージを与える", "priority_text": "攻撃（無い場合はランダム）", "priority": ["attack"], "attack": 5, "skill_id": "mana_absorb", "charge": 2, "charge_max": 8, "special_id": "body_slam", "reward_skill": "魔力吸収", "story_after": true},
-	{"name": "コウモリ男", "hp": 50, "player_hp": 50, "portrait": BATMAN_TEXTURE, "description": "吸血：相手に5ダメージを与え、自分の必殺チャージを1増やす。\n再生：自分のHPを全回復。", "actions": ["吸血", "再生"], "skill_description": "相手に5ダメージを与え、自分の必殺チャージを1増やす", "special_description": "自分のHPを全回復する", "priority_text": "スキル ＞ チャージ ＞ 攻撃", "priority": ["skill", "charge", "attack"], "attack": 10, "skill_id": "vampire", "charge": 2, "charge_max": 6, "special_id": "regeneration", "reward_skill": "吸血", "story_after": true},
-	{"name": "えんじぇるん", "hp": 80, "player_hp": 50, "portrait": ANGELN_TEXTURE, "description": "バリア：1回だけダメージを無効化する（毒ダメージも防ぐ）。有効中は重ねがけできない。\nエンジェルアロー：相手に30ダメージを与え、自分のHPを10回復する。", "actions": ["バリア", "エンジェルアロー"], "skill_description": "次に受ける1回分のダメージを無効化する。毒ダメージも防ぐ。有効中は重ねがけできない", "special_description": "相手に30ダメージを与え、自分のHPを10回復する", "priority_text": "スキル ＞ チャージ ＞ 攻撃", "priority": ["skill", "charge", "attack"], "attack": 8, "skill_id": "barrier", "charge": 2, "charge_max": 8, "special_id": "angel_arrow", "reward_skill": "バリア", "story_after": true},
-	{"name": "魔法少女ぎふと", "hp": 100, "player_hp": 50, "portrait": GIFT_TEXTURE, "portrait_width": 500.0, "description": "プレゼント：自分のHPを10回復。\nデスギフト：相手に50ダメージ。", "actions": ["プレゼント", "デスギフト"], "skill_description": "自分のHPを10回復する", "special_description": "相手に50ダメージを与える", "priority_text": "チャージ ＞ スキル ＞ 攻撃", "priority": ["charge", "skill", "attack"], "attack": 10, "skill_id": "present", "charge": 2, "charge_max": 10, "special_id": "death_gift", "story_after": false}
+	{"name": "コウモリ男", "hp": 50, "player_hp": 50, "portrait": BATMAN_TEXTURE, "description": "攻撃特性：攻撃時にプレイヤーを猛毒にする。\n吸血：相手に10ダメージを与え、自分の必殺チャージを1増やす。\n再生：自分のHPを全回復。", "actions": ["吸血", "再生"], "attack_trait": "攻撃時に相手を猛毒状態にする", "skill_description": "相手に10ダメージを与え、自分の必殺チャージを1増やす", "special_description": "自分のHPを全回復する", "priority_text": "スキル ＞ チャージ ＞ 攻撃（HP半分未満ではチャージ優先）", "priority": ["skill", "charge", "attack"], "attack": 10, "skill_id": "vampire", "charge": 2, "charge_max": 6, "special_id": "regeneration", "reward_skill": "吸血", "story_after": true},
+	{"name": "えんじぇるん", "hp": 80, "player_hp": 50, "portrait": ANGELN_TEXTURE, "description": "バリア：1回だけダメージを無効化する（毒ダメージも防ぐ）。有効中は重ねがけできない。\n攻撃特性：バリア中、攻撃時に必殺チャージを1増やす。\nエンジェルアロー：相手に30ダメージを与え、自分のHPを10回復する。", "actions": ["バリア", "エンジェルアロー"], "attack_trait": "バリア中に攻撃すると必殺チャージを1増やす", "skill_description": "次に受ける1回分のダメージを無効化する。毒ダメージも防ぐ。有効中は重ねがけできない", "special_description": "相手に30ダメージを与え、自分のHPを10回復する", "priority_text": "スキル ＞ チャージ ＞ 攻撃（バリア中はチャージ優先）", "priority": ["skill", "charge", "attack"], "attack": 8, "skill_id": "barrier", "charge": 2, "charge_max": 8, "special_id": "angel_arrow", "reward_skill": "バリア", "story_after": true},
+	{"name": "魔法少女ぎふと", "hp": 100, "player_hp": 50, "portrait": GIFT_TEXTURE, "portrait_width": 500.0, "description": "攻撃特性：攻撃時に自身のHPを2回復。\nプレゼント：自分のHPを10回復。\nデスギフト：相手に50ダメージ。", "actions": ["プレゼント", "デスギフト"], "attack_trait": "攻撃時に自身のHPを2回復する", "skill_description": "自分のHPを10回復する", "special_description": "相手に50ダメージを与える", "priority_text": "チャージ ＞ スキル ＞ 攻撃", "priority": ["charge", "skill", "attack"], "attack": 10, "skill_id": "present", "charge": 2, "charge_max": 10, "special_id": "death_gift", "story_after": false}
 ]
 
 const ENERGY_IMAGES := ["res://Assets/attack.png", "res://Assets/skill.png", "res://Assets/charge.png"]
@@ -88,6 +89,12 @@ func finish_battle() -> void:
 	if not reward_skill.is_empty() and not unlocked_skills.has(reward_skill):
 		unlocked_skills.append(reward_skill)
 	battle_index += 1
+	if not story_enabled:
+		if battle_index >= BATTLES.size():
+			SceneTransition.change_scene_to_file("res://title_screen.tscn")
+		else:
+			SceneTransition.change_scene_to_file("res://battle_prep.tscn")
+		return
 	if data["story_after"]:
 		story_index = battle_index - 1
 		DialogueScene.requested_dialogue_path = "story"
